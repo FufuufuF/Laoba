@@ -10,8 +10,8 @@
         style="width: 100%"
         :loading="loading"
       >
-        <el-table-column prop="studentId" label="学号" width="180" />
-        <el-table-column prop="nickname" label="昵称" width="180" />
+        <el-table-column prop="studentId" label="学号" min-width="150" />
+        <el-table-column prop="nickname" label="昵称" min-width="150" />
         <el-table-column prop="role" label="角色" width="100">
           <template #default="scope">
             <el-tag :type="scope.row.role === 'admin' ? 'danger' : 'primary'">
@@ -26,7 +26,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="300">
+        <el-table-column label="操作" width="220" fixed="right">
           <template #default="scope">
             <template v-if="scope.row.role !== 'admin'">
               <el-button 
@@ -136,8 +136,10 @@ const handleReset = async (studentId: string) => {
 
 <style scoped>
 .admin-container {
-  width: 900px;
-  margin: 50px auto;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 20px;
 }
 .admin-card {
   padding: 20px;
