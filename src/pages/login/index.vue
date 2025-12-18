@@ -1,11 +1,3 @@
-import type { UserInfo } from '@/stores/user';
-// 其他原有导入（如ref、reactive、ElMessage等）
-import { ref, reactive } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
-import { login, register, forgetPassword } from '@/api/user';
-import { validateStudentId, validatePassword, validateNickname } from '@/utils/validate';
 <template>
   <div class="login-container">
     <!-- 登录/注册标签切换 -->

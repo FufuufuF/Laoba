@@ -50,28 +50,28 @@ export const router = createRouter({
     routes: routes,
 });
 
-router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    const userStore = useUserStore();
-    userStore.initUser();
+// router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+//     const userStore = useUserStore();
+//     userStore.initUser();
 
-    if (to.meta.title) {
-        document.title = to.meta.title as string;
-    }
+//     if (to.meta.title) {
+//         document.title = to.meta.title as string;
+//     }
 
-    if (!to.meta.requireAuth) {
-        next();
-        return;
-    }
+//     if (!to.meta.requireAuth) {
+//         next();
+//         return;
+//     }
 
-    if (!userStore.isLoggedIn) {
-        next('/login');
-        return;
-    }
+//     if (!userStore.isLoggedIn) {
+//         next('/login');
+//         return;
+//     }
 
-    if (to.meta.requireAdmin && userStore.userInfo?.role !== 'admin') {
-        next('/home/profile');
-        return;
-    }
+//     if (to.meta.requireAdmin && userStore.userInfo?.role !== 'admin') {
+//         next('/home/profile');
+//         return;
+//     }
 
-    next();
-});
+//     next();
+// });

@@ -5,7 +5,6 @@ import Layout from '@/components/index.vue';
 import Login from '@/pages/login/index.vue';
 import Profile from '@/pages/profile/index.vue';
 import Admin from '@/pages/admin/index.vue';
-import { useUserStore } from '@/stores/user';
 
 
 const routes = [
@@ -22,8 +21,9 @@ const routes = [
     {
         path: '/home',
         component: Layout,
+        redirect: '/home/profile', // 添加默认重定向到 profile
         children: [
-            // 删掉这行：...pageRoutes,
+            // 删掉这行：...pageRoutes
             {
                 path: 'profile',
                 name: 'Profile',
@@ -47,30 +47,4 @@ const routes = [
 export const router = createRouter({
     history: createWebHistory(),
     routes: routes,
-});
-
-router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    const userStore = useUserStore();
-    userStore.initUser();
-
-    if (to.meta.title) {
-        document.title = to.meta.title as string;
-    }
-
-    if (!to.meta.requireAuth) {
-        next();
-        return;
-    }
-
-    if (!userStore.isLoggedIn) {
-        next('/login');
-        return;
-    }
-
-    if (to.meta.requireAdmin && userStore.userInfo?.role !== 'admin') {
-        next('/home/profile');
-        return;
-    }
-
-    next();
 });
