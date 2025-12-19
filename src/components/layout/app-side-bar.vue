@@ -31,15 +31,15 @@
       class="nav-menu"
       router
     >
-      <el-menu-item index="/home/feed">
+      <el-menu-item index="/home">
         <el-icon><HomeFilled /></el-icon>
         <span>首页</span>
       </el-menu-item>
-      <el-menu-item index="/home/profile">
+      <el-menu-item index="/profile">
         <el-icon><User /></el-icon>
         <span>我的</span>
       </el-menu-item>
-      <el-menu-item v-if="isAdmin" index="/home/admin">
+      <el-menu-item v-if="isAdmin" index="/admin">
         <el-icon><Setting /></el-icon>
         <span>用户管理</span>
       </el-menu-item>
@@ -47,7 +47,7 @@
 
     <!-- Create Post Button -->
     <div class="action-area">
-        <el-button type="primary" size="large" round class="post-btn" @click="$router.push('/home/post-create')">
+        <el-button type="primary" size="large" round class="post-btn" @click="$router.push('/post-create')">
             <el-icon class="el-icon--left"><Plus /></el-icon>
             分享新鲜事
         </el-button>
