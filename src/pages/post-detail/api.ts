@@ -1,15 +1,16 @@
 import { apiClient } from '@/api/client';
-import type { Post, Comment } from '@/api/types';
+import type { Post } from '@/types/post';
+import type { Comment } from '@/api/types';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export async function getPostDetail(id: string) {
+export async function getPostDetail(id: number): Promise<Post> {
   try {
       // return await apiClient.get<Post>(`/posts/${id}`);
       throw new Error('No backend');
   } catch (e) {
       await delay(300);
-      const postsStr = localStorage.getItem('mock_posts');
+      const postsStr = localStorage.getItem('mock_posts_new');
       if (postsStr) {
           const posts: Post[] = JSON.parse(postsStr);
           const post = posts.find(p => p.id === id);
@@ -19,7 +20,7 @@ export async function getPostDetail(id: string) {
   }
 }
 
-export async function getComments(id: string) {
+export async function getComments(id: number): Promise<Comment[]> {
   try {
       // return await apiClient.get<Comment[]>(`/posts/${id}/comments`);
       throw new Error('No backend');
@@ -30,7 +31,7 @@ export async function getComments(id: string) {
   }
 }
 
-export async function addComment(postId: string, content: string) {
+export async function addComment(postId: number, content: string): Promise<Comment> {
   try {
       // return await apiClient.post<Comment, { content: string }>(`/posts/${postId}/comments`, { content });
       throw new Error('No backend');
@@ -43,11 +44,11 @@ export async function addComment(postId: string, content: string) {
           id: Date.now().toString(),
           author: {
             id: user.id || user.studentId,
-            nickname: user.nickname || user.username,
-            avatar: user.avatar || ''
+            nickname: user.nickname || user.username || '游客',
+            avatar: user.avatar || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
           },
           content,
-          createdAt: new Date().toISOString()
+          createdAt: Date.now().toString()
       };
       
       const commentsStr = localStorage.getItem(`mock_comments_${postId}`);
@@ -56,13 +57,13 @@ export async function addComment(postId: string, content: string) {
       localStorage.setItem(`mock_comments_${postId}`, JSON.stringify(comments));
       
       // Update post comment count
-      const postsStr = localStorage.getItem('mock_posts');
+      const postsStr = localStorage.getItem('mock_posts_new');
       if (postsStr) {
           const posts: Post[] = JSON.parse(postsStr);
           const post = posts.find(p => p.id === postId);
           if (post) {
-              post.commentCount++;
-              localStorage.setItem('mock_posts', JSON.stringify(posts));
+              post.status.commentCount++;
+              localStorage.setItem('mock_posts_new', JSON.stringify(posts));
           }
       }
       
@@ -70,20 +71,19 @@ export async function addComment(postId: string, content: string) {
   }
 }
 
-export async function likePost(id: string) {
+export async function likePost(id: number) {
   try {
-      // return await apiClient.post<void, { postId: string }>(`/posts/${id}/like`, { postId: id });
+      // return await apiClient.post<void, { postId: number }>(`/posts/${id}/like`, { postId: id });
       throw new Error('No backend');
   } catch (e) {
       await delay(200);
-      const postsStr = localStorage.getItem('mock_posts');
+      const postsStr = localStorage.getItem('mock_posts_new');
       if (postsStr) {
           const posts: Post[] = JSON.parse(postsStr);
           const post = posts.find(p => p.id === id);
           if (post) {
-              post.isLiked = !post.isLiked;
-              post.likeCount += post.isLiked ? 1 : -1;
-              localStorage.setItem('mock_posts', JSON.stringify(posts));
+              post.status.likeCount += 1;
+              localStorage.setItem('mock_posts_new', JSON.stringify(posts));
           }
       }
   }
