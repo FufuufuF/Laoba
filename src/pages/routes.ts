@@ -1,5 +1,6 @@
 // src/pages/routes.ts
-import Profile from '@/pages/profile/index.vue';
+import Setting from '@/pages/setting/index.vue';
+import User from '@/pages/user/index.vue';
 import Admin from '@/pages/admin/index.vue';
 import Home from '@/pages/home/index.vue';
 import PostCreate from '@/pages/post-create/index.vue';
@@ -28,10 +29,16 @@ export const routes = [
                 meta: { title: '动态详情', requireAuth: true },
             },
             {
-                path: 'profile',
-                name: 'Profile',
-                component: Profile,
-                meta: { title: '个人中心', requireAuth: true },
+                path: 'user/:id',
+                name: 'User',
+                component: User,
+                meta: { title: '用户主页', requireAuth: true },
+            },
+            {
+                path: 'setting',
+                name: 'Setting',
+                component: Setting,
+                meta: { title: '个人设置', requireAuth: true },
             },
             {
                 path: 'admin',

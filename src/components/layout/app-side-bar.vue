@@ -35,7 +35,7 @@
         <el-icon><HomeFilled /></el-icon>
         <span>首页</span>
       </el-menu-item>
-      <el-menu-item index="/profile">
+      <el-menu-item index="/setting">
         <el-icon><User /></el-icon>
         <span>我的</span>
       </el-menu-item>

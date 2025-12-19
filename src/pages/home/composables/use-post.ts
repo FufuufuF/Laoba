@@ -1,9 +1,9 @@
-import { usePostStore } from '../stores/post-store';
+import { ref } from 'vue';
 import { getPosts } from '../api';
 import type { Post } from '@/types/post';
 
 export const usePost = () => {
-    const postStore = usePostStore();
+    const postList = ref<Post[]>([]);
 
     const fetchPostList = async () => {
         const res = await getPosts();
@@ -22,11 +22,11 @@ export const usePost = () => {
                 shareCount: item.status.share_count,
             }
         })) as Post[];
-        postStore.postList = posts;
+        postList.value = posts;
     }
 
     return {
-        postList: postStore.postList,
+        postList,
         fetchPostList,
     }
 }
