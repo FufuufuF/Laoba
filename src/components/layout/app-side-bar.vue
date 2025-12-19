@@ -27,26 +27,27 @@
 
     <!-- Navigation Menu -->
     <el-menu
-      default-active="/"
+      :default-active="$route.path"
       class="nav-menu"
+      router
     >
-      <el-menu-item>
+      <el-menu-item index="/home/feed">
         <el-icon><HomeFilled /></el-icon>
         <span>首页</span>
       </el-menu-item>
-      <el-menu-item>
-        <el-icon><ChatDotRound /></el-icon>
-        <span>消息</span>
-      </el-menu-item>
-      <el-menu-item>
+      <el-menu-item index="/home/profile">
         <el-icon><User /></el-icon>
         <span>我的</span>
+      </el-menu-item>
+      <el-menu-item v-if="isAdmin" index="/home/admin">
+        <el-icon><Setting /></el-icon>
+        <span>用户管理</span>
       </el-menu-item>
     </el-menu>
 
     <!-- Create Post Button -->
     <div class="action-area">
-        <el-button type="primary" size="large" round class="post-btn">
+        <el-button type="primary" size="large" round class="post-btn" @click="$router.push('/home/post-create')">
             <el-icon class="el-icon--left"><Plus /></el-icon>
             分享新鲜事
         </el-button>
@@ -55,7 +56,12 @@
 </template>
 
 <script setup lang="ts">
-import { HomeFilled, ChatDotRound, User, Plus } from '@element-plus/icons-vue'
+import { HomeFilled, ChatDotRound, User, Plus, Setting } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user';
+import { computed } from 'vue';
+
+const userStore = useUserStore();
+const isAdmin = computed(() => userStore.userInfo?.role === 'admin');
 </script>
 
 <style scoped>

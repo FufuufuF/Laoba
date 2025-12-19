@@ -5,6 +5,9 @@ import Layout from '@/components/index.vue';
 import Login from '@/pages/login/index.vue';
 import Profile from '@/pages/profile/index.vue';
 import Admin from '@/pages/admin/index.vue';
+import Home from '@/pages/home/index.vue';
+import PostCreate from '@/pages/post-create/index.vue';
+import PostDetail from '@/pages/post-detail/index.vue';
 
 
 const routes = [
@@ -21,9 +24,27 @@ const routes = [
     {
         path: '/home',
         component: Layout,
-        redirect: '/home/profile', // 添加默认重定向到 profile
+        redirect: '/home/feed', // 添加默认重定向到 feed
         children: [
             // 删掉这行：...pageRoutes
+            {
+                path: 'feed',
+                name: 'Feed',
+                component: Home,
+                meta: { title: '首页', requireAuth: true },
+            },
+            {
+                path: 'post-create',
+                name: 'PostCreate',
+                component: PostCreate,
+                meta: { title: '发布动态', requireAuth: true },
+            },
+            {
+                path: 'post/:id',
+                name: 'PostDetail',
+                component: PostDetail,
+                meta: { title: '动态详情', requireAuth: true },
+            },
             {
                 path: 'profile',
                 name: 'Profile',

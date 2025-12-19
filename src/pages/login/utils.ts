@@ -23,6 +23,6 @@ export const mapToUserInfo = (data: any): UserInfo => {
  * 根据用户角色获取跳转路径
  */
 export const getRedirectPath = (role: 'student' | 'admin'): string => {
-  return role === 'admin' ? '/home/admin' : '/home/profile';
+  return role === 'admin' ? '/home/admin' : '/home/feed';
 };
 

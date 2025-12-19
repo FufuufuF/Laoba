@@ -48,6 +48,14 @@ export class ApiClient {
     return this.axios.get(apiPath);
   }
 
+  public delete<T>(apiPath: string): Promise<T> {
+    return this.axios.delete(apiPath);
+  }
+
+  public put<T, D>(apiPath: string, data: D): Promise<T> {
+    return this.axios.put(apiPath, data);
+  }
+
   public post<T, D>(apiPath: string, data: D | FormData): Promise<T> {
     // T为返回数据类型，D为请求数据类型
     return this.axios.post(apiPath, data);
