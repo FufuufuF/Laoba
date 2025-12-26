@@ -69,12 +69,14 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
-import { createPost } from './api';
+import { createPost } from '@/api/post';
+import { useUserStore } from '@/stores/user';
 import { Plus } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import type { UploadFile, UploadUserFile } from 'element-plus';
 
 const router = useRouter();
+const userStore = useUserStore();
 const form = ref({
   title: '',
   text: '',
@@ -144,12 +146,17 @@ const submit = async () => {
       }
     }
     
-    await createPost({
+    const response = await createPost({
       title: form.value.title,
-      text: form.value.text,
+      content: form.value.text,
       tags: form.value.tags,
-      media: media
+      media: media,
+      user_id: Number(userStore.userInfo?.id) || 0,
     });
+    
+    if (response.code !== 200) {
+      throw new Error(response.message || '发布失败');
+    }
     
     ElMessage.success('发布成功');
     router.push('/home');

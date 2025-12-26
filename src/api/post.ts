@@ -19,12 +19,19 @@ export interface PostResponse {
   content: string | null;
   media: MediaItem[] | null;
   tags: string[] | null;
-  view_count: number;
-  like_count: number;
-  comment_count: number;
-  share_count: number;
   created_at: string;
   updated_at: string;
+  author: {
+    user_id: number;
+    avatar?: string;
+    nickname: string;
+  };
+  status: {
+    view_count: number;
+    like_count: number;
+    comment_count: number;
+    share_count: number;
+  };
 }
 
 // =====get接口=====
@@ -39,7 +46,7 @@ export interface PostListResponse {
  * GET /api/v1/post/
  */
 export const getPosts = (): Promise<ApiResponse<PostListResponse>> => {
-  return apiClient.get("/post/");
+  return apiClient.get("/api/v1/post/");
 };
 
 // =====post接口=====
@@ -64,7 +71,7 @@ export interface CreatePostResponse {
 export const createPost = (
   data: CreatePostRequest
 ): Promise<ApiResponse<CreatePostResponse>> => {
-  return apiClient.post("/post/", data);
+  return apiClient.post("/api/v1/post/", data);
 };
 
 // =====get接口=====
@@ -81,5 +88,13 @@ export interface PostDetailResponse {
 export const getPostDetail = (
   postId: number
 ): Promise<ApiResponse<PostDetailResponse>> => {
-  return apiClient.get(`/post/${postId}`);
+  return apiClient.get(`/api/v1/post/${postId}`);
+};
+
+// =====修改帖子状态接口(点赞收藏)=====
+export const updatePostStatus = (
+  postId: number,
+  action: "like" | "unlike" | "collect" | "uncollect"
+): Promise<ApiResponse<PostResponse>> => {
+  return apiClient.post(`/api/v1/post/${postId}/`, { action });
 };
