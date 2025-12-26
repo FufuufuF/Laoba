@@ -17,7 +17,7 @@ export interface AuthCheckResponse {
  * GET /api/v1/auth/
  */
 export const checkAuth = (): Promise<ApiResponse<AuthCheckResponse>> => {
-  return apiClient.get("/auth/");
+  return apiClient.get("/api/v1/auth/");
 };
 
 // =====post接口=====
