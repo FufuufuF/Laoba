@@ -142,7 +142,7 @@ const goToDetail = (post: Post) => {
 // 点赞
 const handleLike = (postId: number) => {
   // TODO: 实现点赞逻辑
-  ElMessage.success('点赞成功');
+  ElMessage({ message: '点赞成功', type: 'success', showClose: true, duration: 2000 });
 };
 
 // 处理下拉菜单命令
@@ -154,7 +154,7 @@ const handleCommand = (command: string, postId: number) => {
       type: 'warning',
     }).then(() => {
       // TODO: 实现删除逻辑
-      ElMessage.success('删除成功');
+      ElMessage({ message: '删除成功', type: 'success', showClose: true, duration: 2000 });
     });
   }
 };

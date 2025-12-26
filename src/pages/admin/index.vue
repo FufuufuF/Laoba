@@ -79,7 +79,7 @@ const loadUserList = async () => {
       userList.value = res.data;
     }
   } catch (err) {
-    ElMessage.error('加载用户列表失败');
+    ElMessage({ message: '加载用户列表失败', type: 'error', showClose: true, duration: 2000 });
     console.error(err);
   } finally {
     loading.value = false;
@@ -104,13 +104,13 @@ const handleForbidden = async (user: UserInfo) => {
     );
     const res = await forbiddenUser(user.id, !user.isForbidden);
     if (res.success) {
-      ElMessage.success(res.msg);
+      ElMessage({ message: res.msg, type: 'success', showClose: true, duration: 2000 });
       loadUserList();
     } else {
-      ElMessage.error(res.msg);
+      ElMessage({ message: res.msg, type: 'error', showClose: true, duration: 2000 });
     }
   } catch (err) {
-    ElMessage.info('已取消操作');
+    ElMessage({ message: '已取消操作', type: 'info', showClose: true, duration: 2000 });
   }
 };
 
@@ -127,13 +127,13 @@ const handleReset = async (studentId: string) => {
     );
     const res = await resetUserInfo(studentId);
     if (res.success) {
-      ElMessage.success(res.msg);
+      ElMessage({ message: res.msg, type: 'success', showClose: true, duration: 2000 });
       loadUserList();
     } else {
-      ElMessage.error(res.msg);
+      ElMessage({ message: res.msg, type: 'error', showClose: true, duration: 2000 });
     }
   } catch (err) {
-    ElMessage.info('已取消操作');
+    ElMessage({ message: '已取消操作', type: 'info', showClose: true, duration: 2000 });
   }
 };
 </script>

@@ -129,7 +129,7 @@ const loadData = async () => {
     post.value = await getPostDetail(postId);
     comments.value = await getComments(postId);
   } catch (e) {
-      ElMessage.error('加载动态失败');
+      ElMessage({ message: '加载动态失败', type: 'error', showClose: true, duration: 2000 });
   } finally {
     loading.value = false;
   }
@@ -140,7 +140,7 @@ const handleLike = async () => {
     try {
         await likePost(post.value.id);
         post.value.status.likeCount += 1;
-        ElMessage.success('点赞成功');
+        ElMessage({ message: '点赞成功', type: 'success', showClose: true, duration: 2000 });
     } catch (e) {}
 };
 
@@ -152,9 +152,9 @@ const submitComment = async () => {
         comments.value.unshift(comment);
         newComment.value = '';
         if (post.value) post.value.status.commentCount++;
-        ElMessage.success('评论成功');
+        ElMessage({ message: '评论成功', type: 'success', showClose: true, duration: 2000 });
     } catch (e) {
-        ElMessage.error('评论失败');
+        ElMessage({ message: '评论失败', type: 'error', showClose: true, duration: 2000 });
     } finally {
         submittingComment.value = false;
     }

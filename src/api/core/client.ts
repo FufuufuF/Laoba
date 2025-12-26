@@ -26,7 +26,12 @@ export class ApiClient {
         return response.data;
       } else {
         // 业务逻辑错误
-        ElMessage.error(response.data.message || "未知错误");
+        ElMessage({
+          message: response.data.message || "未知错误",
+          type: "error",
+          showClose: true,
+          duration: 2000,
+        });
         if (response.data.code === 401) {
           window.location.replace("/login");
         }
@@ -43,7 +48,12 @@ export class ApiClient {
       const displayMessage = status ? `请求失败 (${status})` : "网络异常";
       const displayDescription = remoteMessage || error.message || "未知错误";
 
-      ElMessage.error(displayMessage + "：" + displayDescription);
+      ElMessage({
+        message: displayMessage + "：" + displayDescription,
+        type: "error",
+        showClose: true,
+        duration: 2000,
+      });
 
       return Promise.reject(error);
     };

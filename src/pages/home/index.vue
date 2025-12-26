@@ -52,9 +52,9 @@ const handleLike = async (postId: number) => {
         if (post) {
             post.status.likeCount += 1;
         }
-        ElMessage.success('点赞成功');
+        ElMessage({ message: '点赞成功', type: 'success', showClose: true, duration: 2000 });
     } catch (error) {
-        ElMessage.error('点赞失败');
+        ElMessage({ message: '点赞失败', type: 'error', showClose: true, duration: 2000 });
     }
 };
 

@@ -1,8 +1,8 @@
-import { ref, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
-import { getUserInfo, getUserPosts } from '../api';
-import type { UserInfo } from '@/stores/user';
-import type { Post } from '@/types/post';
+import { ref, onMounted } from "vue";
+import { ElMessage } from "element-plus";
+import { getUserInfo, getUserPosts } from "../api";
+import type { UserInfo } from "@/stores/user";
+import type { Post } from "@/types/post";
 
 /**
  * 用户主页逻辑
@@ -22,7 +22,12 @@ export const useUserProfile = (userId: string) => {
       const res = await getUserInfo(userId);
       userInfo.value = res.data;
     } catch (error) {
-      ElMessage.error('加载用户信息失败');
+      ElMessage({
+        message: "加载用户信息失败",
+        type: "error",
+        showClose: true,
+        duration: 2000,
+      });
       console.error(error);
     } finally {
       loading.value = false;
@@ -42,7 +47,12 @@ export const useUserProfile = (userId: string) => {
       posts.value = reset ? res.data.list : [...posts.value, ...res.data.list];
       total.value = res.data.total;
     } catch (error) {
-      ElMessage.error('加载帖子列表失败');
+      ElMessage({
+        message: "加载帖子列表失败",
+        type: "error",
+        showClose: true,
+        duration: 2000,
+      });
       console.error(error);
     } finally {
       loading.value = false;
@@ -72,4 +82,3 @@ export const useUserProfile = (userId: string) => {
     loadMore,
   };
 };
-

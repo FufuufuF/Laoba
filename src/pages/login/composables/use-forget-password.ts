@@ -26,12 +26,27 @@ export const useForgetPassword = () => {
       const res = { success: true, msg: "" };
 
       if (res.success) {
-        ElMessage.success(res.msg);
+        ElMessage({
+          message: res.msg,
+          type: "success",
+          showClose: true,
+          duration: 2000,
+        });
       } else {
-        ElMessage.error(res.msg);
+        ElMessage({
+          message: res.msg,
+          type: "error",
+          showClose: true,
+          duration: 2000,
+        });
       }
     } catch (err) {
-      ElMessage.info("已取消");
+      ElMessage({
+        message: "已取消",
+        type: "info",
+        showClose: true,
+        duration: 2000,
+      });
     }
   };
 

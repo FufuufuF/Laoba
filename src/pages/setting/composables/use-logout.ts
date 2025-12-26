@@ -1,9 +1,9 @@
 /**
  * 退出登录逻辑组合式函数
  */
-import { ElMessage } from 'element-plus';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
 
 export const useLogout = () => {
   const router = useRouter();
@@ -14,12 +14,16 @@ export const useLogout = () => {
    */
   const handleLogout = () => {
     userStore.logout();
-    ElMessage.success('退出登录成功');
-    router.push('/login');
+    ElMessage({
+      message: "退出登录成功",
+      type: "success",
+      showClose: true,
+      duration: 2000,
+    });
+    router.push("/login");
   };
 
   return {
     handleLogout,
   };
 };
-

@@ -79,7 +79,12 @@ export const useRegister = () => {
    */
   const handleAvatarUpload = (_response: any, file: any) => {
     registerForm.avatar = URL.createObjectURL(file.raw);
-    ElMessage.success("头像上传成功");
+    ElMessage({
+      message: "头像上传成功",
+      type: "success",
+      showClose: true,
+      duration: 2000,
+    });
   };
 
   /**

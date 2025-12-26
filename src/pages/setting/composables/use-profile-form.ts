@@ -1,11 +1,11 @@
 /**
  * 个人资料表单逻辑组合式函数
  */
-import { ref, reactive, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
-import { useUserStore } from '@/stores/user';
-import type { UserInfo } from '@/stores/user';
-import { validateNickname } from '@/utils/validate';
+import { ref, reactive, onMounted } from "vue";
+import { ElMessage } from "element-plus";
+import { useUserStore } from "@/stores/user";
+import type { UserInfo } from "@/stores/user";
+import { validateNickname } from "@/utils/validate";
 
 export const useProfileForm = () => {
   const userStore = useUserStore();
@@ -15,12 +15,12 @@ export const useProfileForm = () => {
 
   // 个人信息表单
   const profileForm = reactive<Partial<UserInfo>>({
-    username: '',
-    nickname: '',
-    avatar: '',
-    bio: '',
+    username: "",
+    nickname: "",
+    avatar: "",
+    bio: "",
     tags: [],
-    role: 'student' as 'student' | 'admin',
+    role: "student" as "student" | "admin",
   });
 
   /**
@@ -31,7 +31,7 @@ export const useProfileForm = () => {
       profileForm.username = userStore.userInfo.username;
       profileForm.nickname = userStore.userInfo.nickname;
       profileForm.avatar = userStore.userInfo.avatar;
-      profileForm.bio = userStore.userInfo.bio || '';
+      profileForm.bio = userStore.userInfo.bio || "";
       profileForm.tags = userStore.userInfo.tags || [];
       profileForm.role = userStore.userInfo.role;
     }
@@ -42,7 +42,12 @@ export const useProfileForm = () => {
    */
   const handleAvatarUpload = (_response: any, file: any) => {
     profileForm.avatar = URL.createObjectURL(file.raw);
-    ElMessage.success('头像上传成功');
+    ElMessage({
+      message: "头像上传成功",
+      type: "success",
+      showClose: true,
+      duration: 2000,
+    });
   };
 
   /**
@@ -72,10 +77,15 @@ export const useProfileForm = () => {
         tags: profileForm.tags,
       });
 
-      ElMessage.success('信息保存成功');
+      ElMessage({
+        message: "信息保存成功",
+        type: "success",
+        showClose: true,
+        duration: 2000,
+      });
       isEdit.value = false;
     } catch (err) {
-      console.error('保存失败：', err);
+      console.error("保存失败：", err);
     } finally {
       saveLoading.value = false;
     }
@@ -105,4 +115,3 @@ export const useProfileForm = () => {
     handleSave,
   };
 };
-
