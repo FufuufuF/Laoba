@@ -1,0 +1,14 @@
+/* ElMessage 全局样式覆盖 - 显示在右上角 */
+.el-message {
+    /* 重置默认的居中定位 */
+    left: auto !important;
+    right: 16px !important;
+    transform: translateY(0) !important;
+    /* 确保在最顶层 */
+    z-index: 9999 !important;
+}
+
+/* 调整消息容器位置 */
+.el-message-box__wrapper {
+    z-index: 9999 !important;
+}
