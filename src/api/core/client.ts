@@ -1,7 +1,11 @@
-import axios, { type AxiosInstance, type AxiosResponse, type AxiosError } from 'axios';
-import { ElMessage } from 'element-plus';
+import axios, {
+  type AxiosInstance,
+  type AxiosResponse,
+  type AxiosError,
+} from "axios";
+import { ElMessage } from "element-plus";
 
-import { API_CONFIG } from './config';
+import { API_CONFIG } from "./config";
 
 export class ApiClient {
   private baseUrl: string;
@@ -22,7 +26,10 @@ export class ApiClient {
         return response.data;
       } else {
         // 业务逻辑错误
-        ElMessage.error(response.data.message || '未知错误');
+        ElMessage.error(response.data.message || "未知错误");
+        if (response.data.code === 401) {
+          window.location.replace("/login");
+        }
         return Promise.reject(response.data.message);
       }
     };
@@ -30,12 +37,13 @@ export class ApiClient {
     const handleError = (error: AxiosError) => {
       // 网络/系统级错误
       const status = error.response?.status;
-      const remoteMessage = (error.response?.data as { message?: string })?.message;
+      const remoteMessage = (error.response?.data as { message?: string })
+        ?.message;
 
-      const displayMessage = status ? `请求失败 (${status})` : '网络异常';
-      const displayDescription = remoteMessage || error.message || '未知错误';
+      const displayMessage = status ? `请求失败 (${status})` : "网络异常";
+      const displayDescription = remoteMessage || error.message || "未知错误";
 
-      ElMessage.error(displayMessage + '：' + displayDescription);
+      ElMessage.error(displayMessage + "：" + displayDescription);
 
       return Promise.reject(error);
     };

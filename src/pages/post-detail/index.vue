@@ -89,7 +89,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { getPostDetail, getComments, addComment, likePost } from './api';
 import type { Post } from '@/types/post';
-import type { Comment } from '@/api/types';
+import type { Comment } from '@/api/core/types';
 import { Star, ChatDotRound } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 

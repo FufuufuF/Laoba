@@ -52,7 +52,7 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';
-import type { Post } from '@/api/types';
+import type { Post } from '@/api/core/types';
 import { More, Star, StarFilled, ChatDotRound } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 
