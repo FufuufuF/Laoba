@@ -27,6 +27,12 @@
           :rules="[{ validator: validateConfirmPwd, trigger: 'blur' }]"
         />
       </el-form-item>
+      <el-form-item label="用户名" prop="username">
+        <el-input
+          v-model="registerForm.username"
+          :placeholder="PLACEHOLDERS.register.username"
+        />
+      </el-form-item>
       <el-form-item label="昵称" prop="nickname">
         <el-input
           v-model="registerForm.nickname"
@@ -50,7 +56,7 @@
       </el-form-item>
       <el-form-item label="个人简介">
         <el-input
-          v-model="registerForm.intro"
+          v-model="registerForm.bio"
           type="textarea"
           :placeholder="PLACEHOLDERS.register.intro"
           rows="3"

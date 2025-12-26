@@ -1,98 +1,90 @@
+/**
+ * 帖子详情页面相关 API
+ */
+import {
+  getPostDetail as apiGetPostDetail,
+  type PostDetailResponse,
+  type PostResponse,
+} from "@/api/post";
 import { apiClient } from "@/api/core/client";
-import type { Post } from "@/types/post";
-import type { Comment } from "@/api/core/types";
+import type { ApiResponse } from "@/api/core/types";
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+// =====get接口=====
+// 获取帖子详情
 
-export async function getPostDetail(id: number): Promise<Post> {
-  try {
-    // return await apiClient.get<Post>(`/posts/${id}`);
-    throw new Error("No backend");
-  } catch (e) {
-    await delay(300);
-    const postsStr = localStorage.getItem("mock_posts_new");
-    if (postsStr) {
-      const posts: Post[] = JSON.parse(postsStr);
-      const post = posts.find((p) => p.id === id);
-      if (post) return post;
-    }
-    throw new Error("Post not found");
-  }
+/**
+ * 获取帖子详情
+ * GET /api/v1/post/{id}
+ */
+export const getPostDetail = (
+  id: number
+): Promise<ApiResponse<PostDetailResponse>> => {
+  return apiGetPostDetail(id);
+};
+
+// =====get接口=====
+// 获取评论列表
+
+export interface CommentAuthor {
+  id: number;
+  nickname: string;
+  avatar: string;
 }
 
-export async function getComments(id: number): Promise<Comment[]> {
-  try {
-    // return await apiClient.get<Comment[]>(`/posts/${id}/comments`);
-    throw new Error("No backend");
-  } catch (e) {
-    await delay(300);
-    const commentsStr = localStorage.getItem(`mock_comments_${id}`);
-    return commentsStr ? JSON.parse(commentsStr) : [];
-  }
+export interface Comment {
+  id: number;
+  author: CommentAuthor;
+  content: string;
+  created_at: string;
 }
 
-export async function addComment(
+export interface CommentsResponse {
+  comments: Comment[];
+}
+
+/**
+ * 获取帖子评论列表
+ * GET /api/v1/post/{id}/comments
+ */
+export const getComments = (
+  postId: number
+): Promise<ApiResponse<CommentsResponse>> => {
+  return apiClient.get(`/post/${postId}/comments`);
+};
+
+// =====post接口=====
+// 添加评论
+
+export interface AddCommentRequest {
+  content: string;
+}
+
+export interface AddCommentResponse {
+  comment: Comment;
+}
+
+/**
+ * 添加评论
+ * POST /api/v1/post/{id}/comments
+ */
+export const addComment = (
   postId: number,
   content: string
-): Promise<Comment> {
-  try {
-    // return await apiClient.post<Comment, { content: string }>(`/posts/${postId}/comments`, { content });
-    throw new Error("No backend");
-  } catch (e) {
-    await delay(300);
-    const userStr =
-      localStorage.getItem("userInfo") || sessionStorage.getItem("userInfo");
-    const user = userStr
-      ? JSON.parse(userStr)
-      : { id: "0", nickname: "游客", avatar: "" };
+): Promise<ApiResponse<AddCommentResponse>> => {
+  const data: AddCommentRequest = { content };
+  return apiClient.post(`/post/${postId}/comments`, data);
+};
 
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      author: {
-        id: user.id || user.studentId,
-        nickname: user.nickname || user.username || "游客",
-        avatar:
-          user.avatar ||
-          "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-      },
-      content,
-      createdAt: Date.now().toString(),
-    };
+// =====post接口=====
+// 点赞帖子
 
-    const commentsStr = localStorage.getItem(`mock_comments_${postId}`);
-    const comments: Comment[] = commentsStr ? JSON.parse(commentsStr) : [];
-    comments.unshift(newComment);
-    localStorage.setItem(`mock_comments_${postId}`, JSON.stringify(comments));
+/**
+ * 点赞帖子
+ * POST /api/v1/post/{id}/like
+ */
+export const likePost = (id: number): Promise<ApiResponse<null>> => {
+  return apiClient.post(`/post/${id}/like`, {});
+};
 
-    // Update post comment count
-    const postsStr = localStorage.getItem("mock_posts_new");
-    if (postsStr) {
-      const posts: Post[] = JSON.parse(postsStr);
-      const post = posts.find((p) => p.id === postId);
-      if (post) {
-        post.status.commentCount++;
-        localStorage.setItem("mock_posts_new", JSON.stringify(posts));
-      }
-    }
-
-    return newComment;
-  }
-}
-
-export async function likePost(id: number) {
-  try {
-    // return await apiClient.post<void, { postId: number }>(`/posts/${id}/like`, { postId: id });
-    throw new Error("No backend");
-  } catch (e) {
-    await delay(200);
-    const postsStr = localStorage.getItem("mock_posts_new");
-    if (postsStr) {
-      const posts: Post[] = JSON.parse(postsStr);
-      const post = posts.find((p) => p.id === id);
-      if (post) {
-        post.status.likeCount += 1;
-        localStorage.setItem("mock_posts_new", JSON.stringify(posts));
-      }
-    }
-  }
-}
+// 导出类型供其他地方使用
+export type { PostResponse, PostDetailResponse };

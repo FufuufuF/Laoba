@@ -2,8 +2,8 @@
  * 鉴权相关 API
  * 公用接口 - 用于登录、注册、登出、鉴权验证
  */
-import { apiClient } from "@/api/core/client";
-import type { ApiResponse } from "@/api/core/types";
+import { apiClient } from "./core/client";
+import type { ApiResponse } from "./core/types";
 
 // =====get接口=====
 // 鉴权验证
@@ -30,7 +30,6 @@ export interface RegisterRequest {
   nickname: string;
   bio?: string;
   tags?: string[];
-  avatar?: string;
 }
 
 export interface RegisterResponse {

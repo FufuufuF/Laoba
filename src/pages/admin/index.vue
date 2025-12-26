@@ -1,4 +1,8 @@
 <template>
+
+</template>
+
+<!-- <template>
   <div class="admin-container">
     <el-card class="admin-card">
       <div slot="header">用户管理</div>
@@ -144,4 +148,4 @@ const handleReset = async (studentId: string) => {
 .admin-card {
   padding: 20px;
 }
-</style>
+</style> -->

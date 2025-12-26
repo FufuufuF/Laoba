@@ -1,24 +1,24 @@
 /**
  * 登录逻辑组合式函数
  */
-import { ref, reactive } from 'vue';
-import { ElMessage } from 'element-plus';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
-import { loginApi, type LoginParams } from '../api';
-import { mapToUserInfo, getRedirectPath } from '../utils';
-import { LOGIN_RULES } from '../const';
+import { ref, reactive } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { getRedirectPath } from "../utils";
+import { LOGIN_RULES } from "../const";
+import type { LoginFormData } from "../types";
+import { login as loginApi } from "../api";
+import type { LoginRequest } from "@/api/auth";
 
 export const useLogin = () => {
   const router = useRouter();
-  const userStore = useUserStore();
   const loginFormRef = ref();
   const loginLoading = ref(false);
 
   // 登录表单数据
-  const loginForm = reactive<LoginParams>({
-    studentId: '',
-    password: '',
+  const loginForm = reactive<LoginFormData>({
+    studentId: "",
+    password: "",
   });
 
   // 登录表单规则
@@ -34,25 +34,19 @@ export const useLogin = () => {
       loginLoading.value = true;
 
       // 调用登录接口
-      const res = await loginApi(loginForm);
-      
-      if (res.success) {
-        ElMessage.success(res.msg);
-        
-        // 映射用户数据
-        const userData = mapToUserInfo(res.data!);
-        
-        // 登录并存储用户信息
-        userStore.login(userData);
-        
-        // 跳转页面
-        const redirectPath = getRedirectPath(userData.role);
-        router.push(redirectPath);
-      } else {
-        ElMessage.error(res.msg);
-      }
+      const res = await loginApi({
+        student_id: loginForm.studentId,
+        password: loginForm.password,
+      } as LoginRequest);
+      ElMessage({
+        message: "登录成功",
+        type: "success",
+        showClose: true, // 显示关闭按钮
+        duration: 2000, // 显示时长，5秒后消失（默认3秒）
+      });
+      router.push(getRedirectPath(res.data.role));
     } catch (err) {
-      console.error('登录失败：', err);
+      console.error("登录失败：", err);
     } finally {
       loginLoading.value = false;
     }
@@ -66,4 +60,3 @@ export const useLogin = () => {
     handleLogin,
   };
 };
-
