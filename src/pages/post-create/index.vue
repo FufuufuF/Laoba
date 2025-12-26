@@ -68,23 +68,18 @@
 
 <script setup lang="ts">
 import { ref, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
-import { createPost } from '@/api/post';
-import { useUserStore } from '@/stores/user';
 import { Plus } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
 import type { UploadFile, UploadUserFile } from 'element-plus';
+import { usePostCreate } from './composables/use-post-create';
 
-const router = useRouter();
-const userStore = useUserStore();
+const { submitting, submitPost } = usePostCreate();
+
 const form = ref({
   title: '',
   text: '',
   tags: [] as string[],
-  media: [] as { url: string; type: 'image' | 'video' }[]
 });
 const fileList = ref<UploadUserFile[]>([]);
-const submitting = ref(false);
 
 // 标签相关
 const tagInputVisible = ref(false);
@@ -120,52 +115,7 @@ const handleRemove = (uploadFile: UploadFile) => {
 };
 
 const submit = async () => {
-  if (!form.value.text.trim() && fileList.value.length === 0) {
-    ElMessage.warning('请输入内容或上传图片/视频');
-    return;
-  }
-
-  submitting.value = true;
-  try {
-    // 处理媒体文件
-    const media: { url: string; type: 'image' | 'video' }[] = [];
-    for (const file of fileList.value) {
-      if (file.raw) {
-        // 判断文件类型
-        const isVideo = file.raw.type.startsWith('video/');
-        // 转换为 Base64 用于本地存储
-        const base64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target?.result as string);
-          reader.readAsDataURL(file.raw!);
-        });
-        media.push({
-          url: base64,
-          type: isVideo ? 'video' : 'image'
-        });
-      }
-    }
-    
-    const response = await createPost({
-      title: form.value.title,
-      content: form.value.text,
-      tags: form.value.tags,
-      media: media,
-      user_id: Number(userStore.userInfo?.id) || 0,
-    });
-    
-    if (response.code !== 200) {
-      throw new Error(response.message || '发布失败');
-    }
-    
-    ElMessage.success('发布成功');
-    router.push('/home');
-  } catch (error: any) {
-    console.error(error);
-    ElMessage.error(error.message || '发布失败');
-  } finally {
-    submitting.value = false;
-  }
+  await submitPost(form.value, fileList.value);
 };
 </script>
 

@@ -57,7 +57,6 @@ export interface CreatePostRequest {
   content: string;
   media: MediaItem[];
   tags: string[];
-  user_id: number;
 }
 
 export interface CreatePostResponse {
