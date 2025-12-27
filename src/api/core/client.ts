@@ -32,9 +32,6 @@ export class ApiClient {
           showClose: true,
           duration: 2000,
         });
-        if (response.data.code === 401) {
-          window.location.replace("/login");
-        }
         return Promise.reject(response.data.message);
       }
     };
@@ -54,6 +51,10 @@ export class ApiClient {
         showClose: true,
         duration: 2000,
       });
+
+      if (status === 401) {
+        window.location.replace("/login");
+      }
 
       return Promise.reject(error);
     };
