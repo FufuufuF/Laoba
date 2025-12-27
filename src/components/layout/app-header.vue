@@ -129,13 +129,10 @@ const handleMenuSelect = (index: string) => {
 // 搜索处理
 const handleSearch = () => {
   if (searchText.value.trim()) {
-    // TODO: 实现搜索功能
-    ElMessage({
-      message: `搜索功能开发中: ${searchText.value}`,
-      type: 'info',
-      showClose: true,
-      duration: 2000
-    })
+    router.push({
+      path: '/search',
+      query: { q: searchText.value.trim() }
+    });
   }
 }
 

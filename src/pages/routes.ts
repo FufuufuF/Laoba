@@ -5,6 +5,7 @@ import Admin from "@/pages/admin/index.vue";
 import Home from "@/pages/home/index.vue";
 import PostCreate from "@/pages/post-create/index.vue";
 import PostDetail from "@/pages/post-detail/index.vue";
+import Search from "@/pages/search/index.vue";
 
 export const routes = [
   {
@@ -15,6 +16,12 @@ export const routes = [
         name: "Home",
         component: Home,
         meta: { title: "首页", requireAuth: false }, // 游客可访问
+      },
+      {
+        path: "search",
+        name: "Search",
+        component: Search,
+        meta: { title: "搜索", requireAuth: false }, // 游客可访问
       },
       {
         path: "post-create",

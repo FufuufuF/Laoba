@@ -45,10 +45,12 @@ export interface PostListResponse {
 
 /**
  * 获取帖子列表
- * GET /api/v1/post/
+ * GET /api/v1/post/?sort_by=latest|hot
  */
-export const getPosts = (): Promise<ApiResponse<PostListResponse>> => {
-  return apiClient.get("/api/v1/post/");
+export const getPosts = (
+  sortBy: "latest" | "hot" = "latest"
+): Promise<ApiResponse<PostListResponse>> => {
+  return apiClient.get(`/api/v1/post/?sort_by=${sortBy}`);
 };
 
 // =====post接口=====

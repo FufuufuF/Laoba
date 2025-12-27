@@ -5,10 +5,12 @@ import type { PostResponse } from "@/api/post";
 
 export const usePost = () => {
   const postList = ref<Post[]>([]);
+  const currentSort = ref<"latest" | "hot">("latest");
 
-  const fetchPostList = async () => {
+  const fetchPostList = async (sortBy: "latest" | "hot" = "latest") => {
+    currentSort.value = sortBy;
     try {
-      const res = await getPostsApi();
+      const res = await getPostsApi(sortBy);
       const posts = res.data.posts.map((item: PostResponse) => ({
         id: item.id,
         title: item.title,
@@ -38,6 +40,7 @@ export const usePost = () => {
 
   return {
     postList,
+    currentSort,
     fetchPostList,
   };
 };
