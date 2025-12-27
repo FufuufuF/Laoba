@@ -85,134 +85,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { getPostDetail, getComments, addComment } from './api';
-import { updatePostStatus } from '@/api/post';
-import type { Post } from '@/types/post';
-import type { Comment } from '@/api/core/types';
+import { usePostDetail } from './composables/use-post-detail';
+import { useComments } from './composables/use-comments';
+import { usePostActions } from './composables/use-post-actions';
+import { formatTime } from './utils';
 import { Star, ChatDotRound } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
 
 const route = useRoute();
 const postId = Number(route.params.id);
 
-const post = ref<Post | null>(null);
-const comments = ref<Comment[]>([]);
-const loading = ref(false);
-const newComment = ref('');
-const submittingComment = ref(false);
+// Composables
+const { post, loading, loadPostDetail } = usePostDetail(postId);
+const { comments, newComment, submittingComment, loadComments, submitComment } = useComments(postId, post);
+const { handleLike } = usePostActions(post);
 
-const formatTime = (timestamp: number) => {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  
-  if (minutes < 1) return '刚刚';
-  if (minutes < 60) return `${minutes}分钟前`;
-  if (hours < 24) return `${hours}小时前`;
-  if (days < 7) return `${days}天前`;
-  
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-};
-
+// 加载数据
 const loadData = async () => {
-  loading.value = true;
-  try {
-    const getCommentsResponse = await getComments(postId);
-    const postDetailResponse = await getPostDetail(postId);
-    
-    // Transform Post Data
-    const apiPost = postDetailResponse.data.post;
-    if (apiPost) {
-      post.value = {
-        id: apiPost.id,
-        title: apiPost.title,
-        content: apiPost.content || '',
-        media: apiPost.media || [],
-        tags: apiPost.tags || [],
-        createAt: new Date(apiPost.created_at).getTime(),
-        updateAt: new Date(apiPost.updated_at).getTime(),
-        author: {
-          id: apiPost.author.user_id,
-          name: apiPost.author.nickname,
-          avatar: apiPost.author.avatar || ''
-        },
-        status: {
-          commentCount: apiPost.status.comment_count,
-          likeCount: apiPost.status.like_count,
-          shareCount: apiPost.status.share_count,
-          isLiked: apiPost.status.is_liked,
-          isCollected: apiPost.status.is_collected
-        }
-      };
-    }
-
-    // Transform Comments Data
-    comments.value = getCommentsResponse.data.comments.map(comment => ({
-      id: String(comment.id),
-      author: {
-        id: String(comment.author.id),
-        nickname: comment.author.nickname,
-        avatar: comment.author.avatar
-      },
-      content: comment.content,
-      createdAt: comment.created_at
-    }));
-
-  } catch (e) {
-      ElMessage({ message: '加载动态失败', type: 'error', showClose: true, duration: 2000 });
-  } finally {
-    loading.value = false;
-  }
-};
-
-const handleLike = async () => {
-    if (!post.value) return;
-    try {
-        const action = post.value.status.isLiked ? 'unlike' : 'like';
-        const response = await updatePostStatus(post.value.id, action);
-        // 使用服务器返回的最新数据更新本地状态
-        post.value.status.likeCount = response.data.status.like_count;
-        post.value.status.isLiked = response.data.status.is_liked;
-    } catch (e) {}
-};
-
-const submitComment = async () => {
-    if (!newComment.value.trim()) return;
-    submittingComment.value = true;
-    try {
-        const response = await addComment(postId, newComment.value);
-        const newCommentApi = response.data.comment;
-        
-        const commentToAdd = {
-            id: String(newCommentApi.id),
-            author: {
-                id: String(newCommentApi.author.id),
-                nickname: newCommentApi.author.nickname,
-                avatar: newCommentApi.author.avatar
-            },
-            content: newCommentApi.content,
-            createdAt: newCommentApi.created_at
-        };
-        
-        comments.value.unshift(commentToAdd);
-        newComment.value = '';
-        if (post.value) post.value.status.commentCount++;
-        ElMessage({ message: '评论成功', type: 'success', showClose: true, duration: 2000 });
-    } catch (e) {
-        ElMessage({ message: '评论失败', type: 'error', showClose: true, duration: 2000 });
-    } finally {
-        submittingComment.value = false;
-    }
+  await Promise.all([loadPostDetail(), loadComments()]);
 };
 
 onMounted(loadData);
