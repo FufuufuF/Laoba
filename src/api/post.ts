@@ -31,6 +31,8 @@ export interface PostResponse {
     like_count: number;
     comment_count: number;
     share_count: number;
+    is_liked: boolean;
+    is_collected: boolean;
   };
 }
 

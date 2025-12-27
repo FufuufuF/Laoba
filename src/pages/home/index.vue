@@ -46,15 +46,17 @@ const goToDetail = (post: Post) => {
 };
 
 const handleLike = async (postId: number) => {
+    const post = postList.value.find((p) => p.id === postId);
+    if (!post) return;
+    
     try {
-        await updatePostStatus(postId, 'like');
-        const post = postList.value.find((p) => p.id === postId);
-        if (post) {
-            post.status.likeCount += 1;
-        }
-        ElMessage({ message: '点赞成功', type: 'success', showClose: true, duration: 2000 });
+        const action = post.status.isLiked ? 'unlike' : 'like';
+        const response = await updatePostStatus(postId, action);
+        // 使用服务器返回的最新数据更新本地状态
+        post.status.likeCount = response.data.status.like_count;
+        post.status.isLiked = response.data.status.is_liked;
     } catch (error) {
-        ElMessage({ message: '点赞失败', type: 'error', showClose: true, duration: 2000 });
+        ElMessage({ message: '操作失败', type: 'error', showClose: true, duration: 2000 });
     }
 };
 

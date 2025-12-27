@@ -33,6 +33,7 @@ export interface CommentAuthor {
 
 export interface Comment {
   id: number;
+  post_id: number;
   author: CommentAuthor;
   content: string;
   created_at: string;
@@ -44,12 +45,12 @@ export interface CommentsResponse {
 
 /**
  * 获取帖子评论列表
- * GET /api/v1/post/{id}/comments
+ * GET /api/v1/comment/{id}
  */
 export const getComments = (
   postId: number
 ): Promise<ApiResponse<CommentsResponse>> => {
-  return apiClient.get(`/post/${postId}/comments`);
+  return apiClient.get(`/api/v1/comment/`, { post_id: postId });
 };
 
 // =====post接口=====
@@ -72,19 +73,5 @@ export const addComment = (
   content: string
 ): Promise<ApiResponse<AddCommentResponse>> => {
   const data: AddCommentRequest = { content };
-  return apiClient.post(`/post/${postId}/comments`, data);
+  return apiClient.post(`/api/v1/post/${postId}/comments`, data);
 };
-
-// =====post接口=====
-// 点赞帖子
-
-/**
- * 点赞帖子
- * POST /api/v1/post/{id}/like
- */
-export const likePost = (id: number): Promise<ApiResponse<null>> => {
-  return apiClient.post(`/post/${id}/like`, {});
-};
-
-// 导出类型供其他地方使用
-export type { PostResponse, PostDetailResponse };

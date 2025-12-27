@@ -14,7 +14,7 @@
         
         <div class="content">
           <h2 class="post-title" v-if="post.title">{{ post.title }}</h2>
-          <p>{{ post.text }}</p>
+          <p>{{ post.content }}</p>
           
           <!-- 标签 -->
           <div v-if="post.tags.length > 0" class="tags">
@@ -44,8 +44,8 @@
         </div>
         
         <div class="actions">
-           <el-button text @click="handleLike">
-             <el-icon><Star /></el-icon> {{ post.status.likeCount }} 点赞
+           <el-button text :class="{ liked: post.status.isLiked }" @click="handleLike">
+             <el-icon><Star /></el-icon> {{ post.status.likeCount }} {{ post.status.isLiked ? '已赞' : '点赞' }}
            </el-button>
            <el-button text>
              <el-icon><ChatDotRound /></el-icon> {{ post.status.commentCount }} 评论
@@ -87,7 +87,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { getPostDetail, getComments, addComment, likePost } from './api';
+import { getPostDetail, getComments, addComment } from './api';
+import { updatePostStatus } from '@/api/post';
 import type { Post } from '@/types/post';
 import type { Comment } from '@/api/core/types';
 import { Star, ChatDotRound } from '@element-plus/icons-vue';
@@ -126,8 +127,47 @@ const formatTime = (timestamp: number) => {
 const loadData = async () => {
   loading.value = true;
   try {
-    post.value = await getPostDetail(postId);
-    comments.value = await getComments(postId);
+    const getCommentsResponse = await getComments(postId);
+    const postDetailResponse = await getPostDetail(postId);
+    
+    // Transform Post Data
+    const apiPost = postDetailResponse.data.post;
+    if (apiPost) {
+      post.value = {
+        id: apiPost.id,
+        title: apiPost.title,
+        content: apiPost.content || '',
+        media: apiPost.media || [],
+        tags: apiPost.tags || [],
+        createAt: new Date(apiPost.created_at).getTime(),
+        updateAt: new Date(apiPost.updated_at).getTime(),
+        author: {
+          id: apiPost.author.user_id,
+          name: apiPost.author.nickname,
+          avatar: apiPost.author.avatar || ''
+        },
+        status: {
+          commentCount: apiPost.status.comment_count,
+          likeCount: apiPost.status.like_count,
+          shareCount: apiPost.status.share_count,
+          isLiked: apiPost.status.is_liked,
+          isCollected: apiPost.status.is_collected
+        }
+      };
+    }
+
+    // Transform Comments Data
+    comments.value = getCommentsResponse.data.comments.map(comment => ({
+      id: String(comment.id),
+      author: {
+        id: String(comment.author.id),
+        nickname: comment.author.nickname,
+        avatar: comment.author.avatar
+      },
+      content: comment.content,
+      createdAt: comment.created_at
+    }));
+
   } catch (e) {
       ElMessage({ message: '加载动态失败', type: 'error', showClose: true, duration: 2000 });
   } finally {
@@ -138,9 +178,11 @@ const loadData = async () => {
 const handleLike = async () => {
     if (!post.value) return;
     try {
-        await likePost(post.value.id);
-        post.value.status.likeCount += 1;
-        ElMessage({ message: '点赞成功', type: 'success', showClose: true, duration: 2000 });
+        const action = post.value.status.isLiked ? 'unlike' : 'like';
+        const response = await updatePostStatus(post.value.id, action);
+        // 使用服务器返回的最新数据更新本地状态
+        post.value.status.likeCount = response.data.status.like_count;
+        post.value.status.isLiked = response.data.status.is_liked;
     } catch (e) {}
 };
 
@@ -148,8 +190,21 @@ const submitComment = async () => {
     if (!newComment.value.trim()) return;
     submittingComment.value = true;
     try {
-        const comment = await addComment(postId, newComment.value);
-        comments.value.unshift(comment);
+        const response = await addComment(postId, newComment.value);
+        const newCommentApi = response.data.comment;
+        
+        const commentToAdd = {
+            id: String(newCommentApi.id),
+            author: {
+                id: String(newCommentApi.author.id),
+                nickname: newCommentApi.author.nickname,
+                avatar: newCommentApi.author.avatar
+            },
+            content: newCommentApi.content,
+            createdAt: newCommentApi.created_at
+        };
+        
+        comments.value.unshift(commentToAdd);
         newComment.value = '';
         if (post.value) post.value.status.commentCount++;
         ElMessage({ message: '评论成功', type: 'success', showClose: true, duration: 2000 });
@@ -207,6 +262,7 @@ onMounted(loadData);
   background-color: #000;
 }
 .actions { margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px; }
+.actions .liked { color: #67c23a; }
 .comments-section { margin-top: 24px; }
 .comment-item { display: flex; gap: 12px; margin-top: 16px; border-bottom: 1px solid #f5f5f5; padding-bottom: 16px; }
 .comment-content { flex: 1; }

@@ -99,7 +99,13 @@ const MOCK_USER_POSTS: Record<string, Post[]> = {
         avatar:
           "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
       },
-      status: { commentCount: 23, likeCount: 156, shareCount: 12 },
+      status: {
+        commentCount: 23,
+        likeCount: 156,
+        shareCount: 12,
+        isLiked: false,
+        isCollected: false,
+      },
     },
   ],
   "102": [
@@ -117,7 +123,13 @@ const MOCK_USER_POSTS: Record<string, Post[]> = {
         avatar:
           "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
       },
-      status: { commentCount: 45, likeCount: 289, shareCount: 31 },
+      status: {
+        commentCount: 45,
+        likeCount: 289,
+        shareCount: 31,
+        isLiked: false,
+        isCollected: false,
+      },
     },
     {
       id: 8,
@@ -136,7 +148,13 @@ const MOCK_USER_POSTS: Record<string, Post[]> = {
         avatar:
           "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
       },
-      status: { commentCount: 88, likeCount: 523, shareCount: 76 },
+      status: {
+        commentCount: 88,
+        likeCount: 523,
+        shareCount: 76,
+        isLiked: false,
+        isCollected: false,
+      },
     },
   ],
   "103": [
@@ -154,7 +172,13 @@ const MOCK_USER_POSTS: Record<string, Post[]> = {
         avatar:
           "https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png",
       },
-      status: { commentCount: 67, likeCount: 423, shareCount: 28 },
+      status: {
+        commentCount: 67,
+        likeCount: 423,
+        shareCount: 28,
+        isLiked: false,
+        isCollected: false,
+      },
     },
   ],
   "104": [
@@ -172,7 +196,13 @@ const MOCK_USER_POSTS: Record<string, Post[]> = {
         avatar:
           "https://cube.elemecdn.com/c/5e/5e5e5e5e5e5e5e5e5e5e5e5e5e5epng.png",
       },
-      status: { commentCount: 91, likeCount: 567, shareCount: 143 },
+      status: {
+        commentCount: 91,
+        likeCount: 567,
+        shareCount: 143,
+        isLiked: false,
+        isCollected: false,
+      },
     },
   ],
   "105": [
@@ -194,7 +224,13 @@ const MOCK_USER_POSTS: Record<string, Post[]> = {
         avatar:
           "https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png",
       },
-      status: { commentCount: 34, likeCount: 298, shareCount: 56 },
+      status: {
+        commentCount: 34,
+        likeCount: 298,
+        shareCount: 56,
+        isLiked: false,
+        isCollected: false,
+      },
     },
   ],
   "106": [
@@ -212,7 +248,13 @@ const MOCK_USER_POSTS: Record<string, Post[]> = {
         avatar:
           "https://cube.elemecdn.com/a/3f/3990ef257c6c86e142d721f16e10png.png",
       },
-      status: { commentCount: 52, likeCount: 384, shareCount: 67 },
+      status: {
+        commentCount: 52,
+        likeCount: 384,
+        shareCount: 67,
+        isLiked: false,
+        isCollected: false,
+      },
     },
   ],
   "107": [
@@ -230,7 +272,13 @@ const MOCK_USER_POSTS: Record<string, Post[]> = {
         avatar:
           "https://cube.elemecdn.com/b/a4/3c999e8b0a5e7b8b8b8b8b8b8b8png.png",
       },
-      status: { commentCount: 78, likeCount: 445, shareCount: 89 },
+      status: {
+        commentCount: 78,
+        likeCount: 445,
+        shareCount: 89,
+        isLiked: false,
+        isCollected: false,
+      },
     },
   ],
 };

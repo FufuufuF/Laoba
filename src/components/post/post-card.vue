@@ -59,7 +59,7 @@
 
     <!-- 互动统计区域 -->
     <div class="post-footer" @click.stop>
-      <div class="stat-item" @click="handleLike">
+      <div class="stat-item" :class="{ liked: post.status.isLiked }" @click="handleLike">
         <el-icon><Star /></el-icon>
         <span>{{ post.status.likeCount }}</span>
       </div>
@@ -261,6 +261,10 @@ const formatTime = (timestamp: number): string => {
 
 .stat-item:hover {
   color: var(--el-color-primary);
+}
+
+.stat-item.liked {
+  color: #67c23a;
 }
 
 .stat-item .el-icon {

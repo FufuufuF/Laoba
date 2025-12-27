@@ -12,7 +12,7 @@ export const usePost = () => {
       const posts = res.data.posts.map((item: PostResponse) => ({
         id: item.id,
         title: item.title,
-        text: item.content,
+        content: item.content,
         media: item.media,
         tags: item.tags,
         createAt: new Date(item.created_at).getTime(),
@@ -26,6 +26,8 @@ export const usePost = () => {
           commentCount: item.status.comment_count,
           likeCount: item.status.like_count,
           shareCount: item.status.share_count,
+          isLiked: item.status.is_liked,
+          isCollected: item.status.is_collected,
         },
       })) as Post[];
       postList.value = posts;
