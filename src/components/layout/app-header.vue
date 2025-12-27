@@ -43,7 +43,6 @@
         <!-- Not Logged In State -->
         <div v-if="!isLoggedIn" class="auth-buttons">
           <el-button link @click="goToLogin">登录</el-button>
-          <el-button type="primary" round @click="goToLogin">注册</el-button>
         </div>
         
         <!-- Logged In State -->
