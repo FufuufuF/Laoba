@@ -62,9 +62,9 @@ export class ApiClient {
     this.axios.interceptors.response.use(handleSuccess, handleError);
   }
 
-  public get<T>(apiPath: string): Promise<T> {
+  public get<T>(apiPath: string, params?: any): Promise<T> {
     // T为返回数据类型
-    return this.axios.get(apiPath);
+    return this.axios.get(apiPath, { params });
   }
 
   public delete<T>(apiPath: string): Promise<T> {
