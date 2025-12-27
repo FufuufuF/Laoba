@@ -30,6 +30,12 @@ router.beforeEach(async (to, from, next) => {
     return;
   }
 
+  // 如果路由不要求鉴权（游客可访问页面），直接放行
+  if (to.meta?.requireAuth === false) {
+    next();
+    return;
+  }
+
   try {
     // 动态导入避免循环依赖
     const { checkAuth } = await import("@/api/auth");

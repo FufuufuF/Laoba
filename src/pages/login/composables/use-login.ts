@@ -9,9 +9,11 @@ import { LOGIN_RULES } from "../const";
 import type { LoginFormData } from "../types";
 import { login as loginApi } from "../api";
 import type { LoginRequest } from "@/api/auth";
+import { useUserStore } from "@/stores/user";
 
 export const useLogin = () => {
   const router = useRouter();
+  const userStore = useUserStore();
   const loginFormRef = ref();
   const loginLoading = ref(false);
 
@@ -38,11 +40,23 @@ export const useLogin = () => {
         student_id: loginForm.studentId,
         password: loginForm.password,
       } as LoginRequest);
+
+      // 更新用户状态到 store
+      userStore.setUserData({
+        id: String(res.data.id),
+        username: res.data.student_id,
+        nickname: res.data.nickname,
+        avatar: "", // 登录响应中没有头像，后续可以从用户信息接口获取
+        role: res.data.role,
+      });
+      // 设置 token 标识已登录
+      userStore.setToken(`token-${res.data.id}-${Date.now()}`);
+
       ElMessage({
         message: "登录成功",
         type: "success",
-        showClose: true, // 显示关闭按钮
-        duration: 2000, // 显示时长，5秒后消失（默认3秒）
+        showClose: true,
+        duration: 2000,
       });
       router.push(getRedirectPath(res.data.role));
     } catch (err) {

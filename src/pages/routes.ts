@@ -14,7 +14,7 @@ export const routes = [
         path: "home",
         name: "Home",
         component: Home,
-        meta: { title: "首页", requireAuth: true },
+        meta: { title: "首页", requireAuth: false }, // 游客可访问
       },
       {
         path: "post-create",
@@ -26,7 +26,7 @@ export const routes = [
         path: "post/:id",
         name: "PostDetail",
         component: PostDetail,
-        meta: { title: "动态详情", requireAuth: true },
+        meta: { title: "动态详情", requireAuth: false }, // 游客可访问
       },
       {
         path: "user/:id",
