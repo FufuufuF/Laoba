@@ -1,27 +1,38 @@
 <template>
   <div class="app-sidebar">
-    <!-- User Info Card (Mock Data) -->
-    <div class="user-card">
+    <!-- User Info Card - Only show when logged in -->
+    <div v-if="isLoggedIn" class="user-card" @click="goToProfile">
       <div class="user-header">
-        <el-avatar :size="64" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+        <el-avatar :size="64" :src="userAvatar" />
         <div class="user-meta">
-          <div class="nickname">User123</div>
-          <div class="bio">热爱生活，热爱编程</div>
+          <div class="nickname">{{ displayName }}</div>
+          <div class="bio">{{ userBio }}</div>
         </div>
       </div>
       <div class="user-stats">
         <div class="stat-item">
-          <div class="count">128</div>
+          <div class="count">{{ userStats.following }}</div>
           <div class="label">关注</div>
         </div>
         <div class="stat-item">
-          <div class="count">320</div>
+          <div class="count">{{ userStats.followers }}</div>
           <div class="label">粉丝</div>
         </div>
         <div class="stat-item">
-          <div class="count">1.2k</div>
+          <div class="count">{{ userStats.likes }}</div>
           <div class="label">获赞</div>
         </div>
+      </div>
+    </div>
+
+    <!-- Guest State Card -->
+    <div v-else class="user-card guest-card">
+      <div class="guest-content">
+        <el-icon :size="32" class="guest-icon"><User /></el-icon>
+        <p class="guest-text">登录后查看个人信息</p>
+        <el-button type="primary" size="small" round @click="goToLogin">
+          立即登录
+        </el-button>
       </div>
     </div>
 
@@ -35,7 +46,7 @@
         <el-icon><HomeFilled /></el-icon>
         <span>首页</span>
       </el-menu-item>
-      <el-menu-item index="/setting">
+      <el-menu-item v-if="isLoggedIn" :index="profilePath">
         <el-icon><User /></el-icon>
         <span>我的</span>
       </el-menu-item>
@@ -47,7 +58,7 @@
 
     <!-- Create Post Button -->
     <div class="action-area">
-        <el-button type="primary" size="large" round class="post-btn" @click="$router.push('/post-create')">
+        <el-button type="primary" size="large" round class="post-btn" @click="handleCreatePost">
             <el-icon class="el-icon--left"><Plus /></el-icon>
             分享新鲜事
         </el-button>
@@ -56,12 +67,52 @@
 </template>
 
 <script setup lang="ts">
-import { HomeFilled, ChatDotRound, User, Plus, Setting } from '@element-plus/icons-vue'
-import { useUserStore } from '@/stores/user';
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { HomeFilled, User, Plus, Setting } from '@element-plus/icons-vue';
+import { useUserStore } from '@/stores/user';
+import { useLoginPrompt } from '@/composables/use-login-prompt';
 
+const router = useRouter();
 const userStore = useUserStore();
+const { requireLogin } = useLoginPrompt();
+
+// 用户状态
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 const isAdmin = computed(() => userStore.userInfo?.role === 'admin');
+const displayName = computed(() => userStore.displayName);
+const userAvatar = computed(() => 
+  userStore.userInfo?.avatar || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
+);
+const userBio = computed(() => userStore.userInfo?.bio || '这个人很懒，什么都没写~');
+const profilePath = computed(() => `/user/${userStore.userInfo?.id || ''}`);
+
+// TODO: 用户统计数据需要从后端 API 获取，暂时使用占位数据
+const userStats = computed(() => ({
+  following: 0,
+  followers: 0,
+  likes: 0,
+}));
+
+// 跳转到个人主页
+const goToProfile = () => {
+  if (userStore.userInfo?.id) {
+    router.push(`/user/${userStore.userInfo.id}`);
+  }
+};
+
+// 跳转到登录页
+const goToLogin = () => {
+  router.push('/login');
+};
+
+// 发布动态（需要登录）
+const handleCreatePost = async () => {
+  const canProceed = await requireLogin(undefined, '请先登录后再发布动态');
+  if (canProceed) {
+    router.push('/post-create');
+  }
+};
 </script>
 
 <style scoped>
@@ -76,6 +127,37 @@ const isAdmin = computed(() => userStore.userInfo?.role === 'admin');
   margin-bottom: 20px;
   text-align: center;
   border: 1px solid var(--el-border-color-light);
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.user-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.guest-card {
+  cursor: default;
+}
+
+.guest-card:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.guest-content {
+  padding: 16px 0;
+}
+
+.guest-icon {
+  color: var(--el-text-color-placeholder);
+  margin-bottom: 8px;
+}
+
+.guest-text {
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
+  margin: 8px 0 16px;
 }
 
 .user-header {
