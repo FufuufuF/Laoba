@@ -19,6 +19,15 @@
 
       <!-- User Actions Area -->
       <div class="user-actions">
+        <!-- Theme Toggle Button -->
+        <el-button 
+          text 
+          :icon="isDark ? Sunny : Moon" 
+          @click="toggleTheme"
+          circle
+          class="theme-toggle"
+        />
+        
         <!-- Not Logged In State (Mock logic) -->
         <div v-if="!isLogin" class="auth-buttons">
             <el-button link>登录</el-button>
@@ -49,10 +58,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Search, ArrowDown } from '@element-plus/icons-vue'
+import { Search, ArrowDown, Moon, Sunny } from '@element-plus/icons-vue'
+import { useThemeStore } from '@/stores/theme'
 
 const searchText = ref('')
 const isLogin = ref(true) // Mock login state
+const themeStore = useThemeStore()
+const { isDark, toggleTheme } = themeStore
 </script>
 
 <style scoped>
@@ -92,6 +104,16 @@ const isLogin = ref(true) // Mock login state
 .user-actions {
   display: flex;
   align-items: center;
+  gap: 16px;
+}
+
+.theme-toggle {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: rotate(20deg);
 }
 
 .auth-buttons {
