@@ -40,6 +40,15 @@
 
       <!-- User Actions Area -->
       <div class="user-actions">
+        <!-- Theme Toggle Button -->
+        <el-button 
+          text 
+          :icon="isDark ? Sunny : Moon" 
+          @click="toggleTheme"
+          circle
+          class="theme-toggle"
+        />
+
         <!-- Not Logged In State -->
         <div v-if="!isLoggedIn" class="auth-buttons">
           <el-button link @click="goToLogin">登录</el-button>
@@ -89,17 +98,24 @@ import {
   Compass, 
   User, 
   Setting, 
-  SwitchButton 
+  SwitchButton,
+  Moon,
+  Sunny
 } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
+import { useThemeStore } from '@/stores/theme'
 import { logout as logoutApi } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
+const themeStore = useThemeStore()
 
 const searchText = ref('')
+
+// 主题切换
+const { isDark, toggleTheme } = themeStore
 
 // 使用真实的用户状态
 const isLoggedIn = computed(() => userStore.isLoggedIn)
@@ -229,6 +245,16 @@ const handleCommand = async (command: string) => {
 .user-actions {
   display: flex;
   align-items: center;
+  gap: 16px;
+}
+
+.theme-toggle {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: rotate(20deg);
 }
 
 .auth-buttons {
