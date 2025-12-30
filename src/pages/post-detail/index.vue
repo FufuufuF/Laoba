@@ -68,10 +68,10 @@
 
         <div class="comment-list">
           <div v-for="comment in comments" :key="comment.id" class="comment-item">
-            <el-avatar :src="comment.author.avatar" :size="32" />
+            <el-avatar :src="comment.user.avatar" :size="32" />
             <div class="comment-content">
               <div class="comment-header">
-                <span class="nickname">{{ comment.author.nickname }}</span>
+                <span class="nickname">{{ comment.user.nickname }}</span>
                 <span class="time">{{ formatTime(Number(comment.createdAt)) }}</span>
               </div>
               <p>{{ comment.content }}</p>

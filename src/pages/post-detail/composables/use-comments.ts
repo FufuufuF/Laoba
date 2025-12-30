@@ -21,10 +21,10 @@ export const useComments = (postId: number, post: Ref<Post | null>) => {
       const response = await getComments(postId);
       comments.value = response.data.comments.map((comment) => ({
         id: String(comment.id),
-        author: {
-          id: String(comment.author.id),
-          nickname: comment.author.nickname,
-          avatar: comment.author.avatar,
+        user: {
+          id: String(comment.user.id),
+          nickname: comment.user.nickname,
+          avatar: comment.user.avatar,
         },
         content: comment.content,
         createdAt: comment.created_at,
@@ -47,10 +47,10 @@ export const useComments = (postId: number, post: Ref<Post | null>) => {
 
       const commentToAdd: Comment = {
         id: String(newCommentApi.id),
-        author: {
-          id: String(newCommentApi.author.id),
-          nickname: newCommentApi.author.nickname,
-          avatar: newCommentApi.author.avatar,
+        user: {
+          id: String(newCommentApi.user.id),
+          nickname: newCommentApi.user.nickname,
+          avatar: newCommentApi.user.avatar,
         },
         content: newCommentApi.content,
         createdAt: newCommentApi.created_at,
