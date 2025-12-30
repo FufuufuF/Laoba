@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { checkAuth } from "@/api/auth";
+import { getUserInfo } from "@/api/user";
 import { useUserStore } from "@/stores/user";
 
 /**
@@ -36,8 +37,27 @@ export function useAppInit() {
       // 鉴权成功：code === 0
       if (response.code === 0 && response.data?.user_id) {
         isAuthenticated.value = true;
-        // 可选：更新 store 中的用户 ID
-        // userStore.setUserData({ id: String(response.data.user_id), ... })
+
+        // 获取完整用户信息并存入 store
+        try {
+          const userResponse = await getUserInfo();
+          if (userResponse.code === 0 && userResponse.data) {
+            const userData = userResponse.data;
+            userStore.setUserData({
+              id: String(userData.id),
+              username: userData.student_id,
+              avatar: userData.avator,
+              nickname: userData.nickname,
+              bio: userData.bio,
+              role: userData.role,
+              tags: userData.tags,
+              isForbidden: userData.is_forbidden,
+            });
+          }
+        } catch (err) {
+          console.error("[useAppInit] 获取用户信息失败:", err);
+        }
+
         return true;
       }
 
