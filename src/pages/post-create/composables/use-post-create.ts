@@ -10,6 +10,7 @@ export interface PostForm {
   title: string;
   text: string;
   tags: string[];
+  visibility: "public" | "friends" | "private";
 }
 
 /**
@@ -50,6 +51,7 @@ export function usePostCreate() {
         content: form.text,
         tags: form.tags,
         media: media,
+        visibility: form.visibility,
       });
 
       if (response.code !== 0) {

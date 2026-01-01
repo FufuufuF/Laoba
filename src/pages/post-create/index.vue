@@ -58,6 +58,20 @@
         </el-upload>
       </el-form-item>
 
+      <el-form-item label="可见范围">
+        <el-radio-group v-model="form.visibility">
+          <el-radio-button value="public">
+            🌐 公开
+          </el-radio-button>
+          <el-radio-button value="friends">
+            👥 好友可见
+          </el-radio-button>
+          <el-radio-button value="private">
+            🔒 仅自己
+          </el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" @click="submit" :loading="submitting">发布</el-button>
         <el-button @click="$router.back()">取消</el-button>
@@ -78,6 +92,7 @@ const form = ref({
   title: '',
   text: '',
   tags: [] as string[],
+  visibility: 'public' as 'public' | 'friends' | 'private',
 });
 const fileList = ref<UploadUserFile[]>([]);
 
