@@ -5,21 +5,6 @@
 import { apiClient } from "@/api/core/client";
 import type { ApiResponse } from "@/api/core/types";
 
-// =====get接口=====
-// 鉴权验证
-
-export interface AuthCheckResponse {
-  user_id: number;
-}
-
-/**
- * 验证当前用户的 cookie 是否有效
- * GET /api/v1/auth/
- */
-export const checkAuth = (): Promise<ApiResponse<AuthCheckResponse>> => {
-  return apiClient.get("/auth/");
-};
-
 // =====post接口=====
 // 用户注册
 

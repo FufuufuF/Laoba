@@ -20,5 +20,5 @@ export interface GetUserInfoResponse {
 }
 
 export const getUserInfo = (): Promise<ApiResponse<GetUserInfoResponse>> => {
-  return apiClient.get(`/api/v1/user/me/`);
+  return apiClient.get(`/api/v1/user/me`);
 };
