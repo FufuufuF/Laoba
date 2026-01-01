@@ -21,10 +21,14 @@ export interface AdminPost {
   user_id: number;
   title: string;
   content: string | null;
+  media: Array<{ type: "image" | "video"; url: string }>;
+  tags: string[];
+  visibility: "public" | "friends" | "private";
   review_status: "pending" | "approved" | "rejected";
   created_at: string;
   author_nickname: string | null;
   author_student_id: string | null;
+  author_avatar: string | null;
 }
 
 export interface AdminComment {
