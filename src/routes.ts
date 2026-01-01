@@ -1,5 +1,6 @@
 // src/routes.ts
 import { createRouter, createWebHistory } from "vue-router";
+import { ElMessage } from "element-plus";
 import Layout from "@/components/index.vue";
 import { routes as pageRoutes } from "@/pages/routes";
 import Login from "@/pages/login/index.vue";
@@ -43,6 +44,12 @@ router.beforeEach(async (to, from, next) => {
 
     // 鉴权成功：code === 0
     if (response.code === 0 && response.data?.user_id) {
+      // 检查管理员权限
+      if (to.meta?.requireAdmin && response.data?.role !== "admin") {
+        ElMessage.error("需要管理员权限");
+        next("/home");
+        return;
+      }
       next();
       return;
     }

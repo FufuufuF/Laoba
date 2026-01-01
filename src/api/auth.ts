@@ -10,6 +10,7 @@ import type { ApiResponse } from "./core/types";
 
 export interface AuthCheckResponse {
   user_id: number;
+  role: "student" | "admin";
 }
 
 /**

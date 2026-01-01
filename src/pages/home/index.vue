@@ -10,7 +10,7 @@
         
         <div class="post-list">
             <!-- 骨架屏加载态 -->
-            <template v-if="loading">
+            <template v-if="loading && postList.length === 0">
                 <post-skeleton v-for="i in 3" :key="i" />
             </template>
             
@@ -31,6 +31,18 @@
                 />
             </template>
         </div>
+        
+        <!-- 加载更多按钮 -->
+        <div v-if="postList.length > 0" class="load-more">
+            <el-button 
+                v-if="hasMore" 
+                :loading="loading" 
+                @click="handleLoadMore"
+            >
+                {{ loading ? '加载中...' : '加载更多' }}
+            </el-button>
+            <span v-else class="no-more">没有更多了</span>
+        </div>
     </div>
 </template>
 
@@ -45,7 +57,7 @@ import { updatePostStatus } from '@/api/post';
 import type { Post } from '@/types/post';
 
 const router = useRouter();
-const { postList, fetchPostList } = usePost();
+const { postList, hasMore, fetchPostList, loadMore } = usePost();
 const loading = ref(false);
 const activeTab = ref<'latest' | 'hot'>('latest');
 
@@ -64,6 +76,10 @@ const handleTabChange = async (tab: 'latest' | 'hot') => {
     } finally {
         loading.value = false;
     }
+};
+
+const handleLoadMore = async () => {
+    await loadMore();
 };
 
 const handleLike = async (postId: number) => {
@@ -125,5 +141,16 @@ onMounted(async () => {
 
 .empty-state {
     padding: 60px 0;
+}
+
+.load-more {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.no-more {
+    color: #909399;
+    font-size: 14px;
 }
 </style>

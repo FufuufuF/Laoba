@@ -19,7 +19,7 @@
 
     <!-- 帖子内容 -->
     <div class="post-content">
-      {{ post.text }}
+      {{ post.content }}
     </div>
 
     <!-- 媒体内容区域 -->

@@ -41,16 +41,24 @@ export interface PostResponse {
 
 export interface PostListResponse {
   posts: PostResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
 }
 
 /**
  * 获取帖子列表
- * GET /api/v1/post/?sort_by=latest|hot
+ * GET /api/v1/post/?sort_by=latest|hot&page=1&page_size=20
  */
 export const getPosts = (
-  sortBy: "latest" | "hot" = "latest"
+  sortBy: "latest" | "hot" = "latest",
+  page: number = 1,
+  pageSize: number = 20
 ): Promise<ApiResponse<PostListResponse>> => {
-  return apiClient.get(`/api/v1/post/?sort_by=${sortBy}`);
+  return apiClient.get(
+    `/api/v1/post/?sort_by=${sortBy}&page=${page}&page_size=${pageSize}`
+  );
 };
 
 // =====post接口=====

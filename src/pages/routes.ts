@@ -47,12 +47,12 @@ export const routes = [
         component: Setting,
         meta: { title: "个人设置", requireAuth: true },
       },
-      // {
-      //     path: 'admin',
-      //     name: 'Admin',
-      //     component: Admin,
-      //     meta: { title: '管理后台', requireAuth: true, requireAdmin: true },
-      // },
+      {
+        path: "admin",
+        name: "Admin",
+        component: Admin,
+        meta: { title: "管理后台", requireAuth: true, requireAdmin: true },
+      },
     ],
   },
 ];

@@ -12,10 +12,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppHeader: typeof import('./src/components/layout/app-header.vue')['default']
-    AppSidebar: typeof import('./src/components/layout/AppSidebar.vue')['default']
     AppSideBar: typeof import('./src/components/layout/app-side-bar.vue')['default']
     Components: typeof import('./src/components/index.vue')['default']
-    ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
@@ -38,6 +36,9 @@ declare module 'vue' {
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPageHeader: typeof import('element-plus/es')['ElPageHeader']
+    ElPagination: typeof import('element-plus/es')['ElPagination']
+    ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
+    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElTable: typeof import('element-plus/es')['ElTable']
@@ -46,7 +47,6 @@ declare module 'vue' {
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElUpload: typeof import('element-plus/es')['ElUpload']
-    Layout: typeof import('./src/components/layout.vue')['default']
     LoginPromptDialog: typeof import('./src/components/login-prompt-dialog.vue')['default']
     PostCard: typeof import('./src/components/post/post-card.vue')['default']
     PostSkeleton: typeof import('./src/components/post/post-skeleton.vue')['default']
