@@ -53,7 +53,11 @@ export class ApiClient {
       });
 
       if (status === 401) {
-        window.location.replace("/login");
+        // 排除鉴权检查接口本身，避免 initApp 和此处双重跳转导致无限循环
+        const requestUrl = error.config?.url || "";
+        if (!requestUrl.includes("/api/v1/auth/")) {
+          window.location.replace("/login");
+        }
       }
 
       return Promise.reject(error);
