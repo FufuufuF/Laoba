@@ -27,7 +27,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/laoba": {
-        target: "http://localhost:8000",
+        target: "http://172.24.190.42:8000",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/laoba/, ""),
       },

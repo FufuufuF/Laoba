@@ -1,109 +1,121 @@
 <template>
   <div class="user-profile-page">
-    <el-card class="user-info-card" v-loading="loading">
-      <!-- 用户信息头部 -->
-      <div class="user-header">
-        <el-avatar :size="80" :src="userInfo?.avatar" />
-        <div class="user-meta">
-          <div class="user-name-row">
-            <h2 class="nickname">{{ userInfo?.nickname }}</h2>
-            <el-tag v-if="userInfo?.role === 'admin'" type="danger" size="small">管理员</el-tag>
-            <el-tag v-else-if="userInfo?.isForbidden" type="info" size="small">已封禁</el-tag>
-          </div>
-          <div class="username">学号：{{ userInfo?.username }}</div>
-          <div v-if="userInfo?.bio" class="bio">{{ userInfo.bio }}</div>
-          <div v-if="userInfo?.tags && userInfo.tags.length > 0" class="tags">
-            <el-tag
-              v-for="tag in userInfo.tags"
-              :key="tag"
-              size="small"
-              type="info"
-              effect="plain"
-            >
-              {{ tag }}
-            </el-tag>
-          </div>
+    <!-- 顶部背景图 -->
+    <div 
+      class="profile-background" 
+      :style="{ backgroundImage: `url(${userInfo?.background || defaultBackground})` }"
+    >
+      <div class="background-overlay"></div>
+    </div>
+
+    <div class="profile-content">
+      <!-- 用户信息区域 -->
+      <div class="user-info-section">
+        <div class="user-info-left">
+          <el-avatar :size="120" :src="userInfo?.avatar" class="user-avatar" />
         </div>
         
-        <!-- 操作按钮区域 -->
-        <div class="actions">
-          <el-button v-if="isCurrentUser" type="primary" @click="goToSetting">
-            <el-icon><Edit /></el-icon>
-            编辑资料
-          </el-button>
-          <el-button v-else type="primary" plain>
-            <el-icon><Plus /></el-icon>
-            关注
-          </el-button>
+        <div class="user-info-right">
+          <div class="name-row">
+            <h1 class="nickname">{{ userInfo?.nickname }}</h1>
+            <div class="tags-row" v-if="userInfo?.tags">
+              <el-tag 
+                v-for="tag in userInfo.tags" 
+                :key="tag" 
+                size="small" 
+                effect="plain" 
+                round
+                class="user-tag"
+              >
+                {{ tag }}
+              </el-tag>
+            </div>
+          </div>
+          
+          <!-- <div class="user-id">小红书号：{{ userInfo?.username }}</div> -->
+          
+          <div class="user-bio">{{ userInfo?.bio || '这个人很懒，什么都没写~' }}</div>
+          
+          <div class="user-stats-row">
+            <div class="stat-item">
+              <span class="count">{{ userInfo?.following_count || 0 }}</span>
+              <span class="label">关注</span>
+            </div>
+            <div class="stat-item">
+              <span class="count">{{ userInfo?.followers_count || 0 }}</span>
+              <span class="label">粉丝</span>
+            </div>
+            <div class="stat-item">
+              <span class="count">{{ userInfo?.likeCount || 0 }}</span>
+              <span class="label">获赞与收藏</span>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <template v-if="isCurrentUser">
+              <el-button type="primary" round @click="goToSetting">编辑资料</el-button>
+            </template>
+            <template v-else>
+              <el-button 
+                :type="userInfo?.is_following ? 'default' : 'primary'" 
+                round 
+                :icon="userInfo?.is_following ? 'Check' : 'Plus'"
+                @click="handleFollow"
+              >
+                {{ userInfo?.is_following ? '已关注' : '关注' }}
+              </el-button>
+              <el-button round icon="ChatDotRound">私信</el-button>
+            </template>
+          </div>
         </div>
       </div>
 
-      <!-- 统计信息 -->
-      <div class="user-stats">
-        <div class="stat-item">
-          <div class="stat-value">{{ total }}</div>
-          <div class="stat-label">帖子</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">0</div>
-          <div class="stat-label">关注</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">0</div>
-          <div class="stat-label">粉丝</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">0</div>
-          <div class="stat-label">获赞</div>
-        </div>
-      </div>
-    </el-card>
-
-    <!-- 帖子列表 -->
-    <div class="posts-section">
-      <h3 class="section-title">TA 的帖子</h3>
-      
-      <div v-if="posts.length === 0 && !loading" class="empty-state">
-        <el-empty description="还没有发布任何帖子" />
-      </div>
-
-      <div v-else class="posts-list">
-        <post-card
-          v-for="post in posts"
-          :key="post.id"
-          :post="post"
-          @click="goToDetail"
-          @like="handleLike"
-          @comment="goToDetail"
-        >
-          <template #actions>
-            <el-dropdown v-if="isAuthor(post)" @command="(cmd) => handleCommand(cmd, post.id)" @click.stop>
-              <span class="el-dropdown-link">
-                <el-icon><More /></el-icon>
-              </span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="delete" style="color: red;">删除</el-dropdown-item>
-                </el-dropdown-menu>
+      <!-- 内容 Tabs -->
+      <el-tabs v-model="activeTab" class="content-tabs">
+        <el-tab-pane label="笔记" name="posts">
+          <div v-if="posts.length === 0 && !loading" class="empty-state">
+            <el-empty description="还没有发布任何笔记" />
+          </div>
+          
+          <div v-else class="posts-grid">
+            <post-card
+              v-for="post in posts"
+              :key="post.id"
+              :post="post"
+              @click="goToDetail"
+              @like="handleLike"
+              @comment="goToDetail"
+            >
+              <template #actions>
+                <el-dropdown v-if="isAuthor(post)" @command="(cmd: string) => handleCommand(cmd, post.id)" @click.stop>
+                  <span class="el-dropdown-link">
+                    <el-icon><More /></el-icon>
+                  </span>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="delete" style="color: red;">删除</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
               </template>
-            </el-dropdown>
-          </template>
-        </post-card>
-
-        <!-- 加载更多 -->
-        <div v-if="posts.length < total" class="load-more">
-          <el-button @click="loadMore" :loading="loading">加载更多</el-button>
-        </div>
-      </div>
+            </post-card>
+          </div>
+          
+          <!-- 加载更多 -->
+          <div v-if="posts.length < postsTotal" class="load-more">
+            <el-button text @click="loadMorePosts" :loading="loading">加载更多</el-button>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { Edit, Plus, More } from '@element-plus/icons-vue';
+import { Edit, Plus, More, Setting, ChatDotRound, Check } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/user';
 import { useUserProfile } from './composables/use-user-profile';
 import PostCard from '@/components/post/post-card.vue';
@@ -113,11 +125,24 @@ const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
 
+// 默认背景图
+const defaultBackground = 'https://picsum.photos/1200/400?random=999';
+
+// 当前激活的 Tab
+const activeTab = ref('posts');
+
 // 获取用户ID
 const userId = computed(() => route.params.id as string);
 
 // 使用用户主页逻辑
-const { loading, userInfo, posts, total, loadMore } = useUserProfile(userId.value);
+const { 
+  loading, 
+  userInfo, 
+  posts, 
+  postsTotal, 
+  loadMorePosts, 
+  handleFollow
+} = useUserProfile(userId.value);
 
 // 是否是当前登录用户
 const isCurrentUser = computed(() => {
@@ -131,7 +156,7 @@ const isAuthor = (post: Post) => {
 
 // 跳转到设置页
 const goToSetting = () => {
-  router.push('/setting');
+  router.push({ path: '/setting', query: { edit: 'true' } });
 };
 
 // 跳转到帖子详情
@@ -141,7 +166,6 @@ const goToDetail = (post: Post) => {
 
 // 点赞
 const handleLike = (postId: number) => {
-  // TODO: 实现点赞逻辑
   ElMessage({ message: '点赞成功', type: 'success', showClose: true, duration: 2000 });
 };
 
@@ -153,7 +177,6 @@ const handleCommand = (command: string, postId: number) => {
       cancelButtonText: '取消',
       type: 'warning',
     }).then(() => {
-      // TODO: 实现删除逻辑
       ElMessage({ message: '删除成功', type: 'success', showClose: true, duration: 2000 });
     });
   }
@@ -162,34 +185,62 @@ const handleCommand = (command: string, postId: number) => {
 
 <style scoped>
 .user-profile-page {
-  max-width: 800px;
+  min-height: 100vh;
+  background-color: var(--el-bg-color);
+}
+
+.profile-background {
+  height: 240px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
+}
+
+.profile-content {
+  max-width: 960px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 20px;
+  position: relative;
+  top: -40px; /* 让内容部分上移，覆盖一点背景图 */
 }
 
-.user-info-card {
-  margin-bottom: 20px;
-}
-
-.user-header {
+.user-info-section {
   display: flex;
-  gap: 20px;
+  gap: 32px;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
-.user-meta {
+.user-avatar-wrapper {
+  flex-shrink: 0;
+  padding: 4px;
+  background: var(--el-bg-color);
+  border-radius: 50%;
+}
+
+.user-avatar {
+  border: 4px solid var(--el-bg-color);
+}
+
+.user-info-right {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  padding-top: 48px; /* 抵消 top: -40px 的影响，让文字对齐 */
 }
 
-.user-name-row {
+.name-row {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 8px;
 }
 
 .nickname {
@@ -199,79 +250,123 @@ const handleCommand = (command: string, postId: number) => {
   color: var(--el-text-color-primary);
 }
 
-.username {
-  font-size: 14px;
-  color: var(--el-text-color-secondary);
+.tags-row {
+  display: flex;
+  gap: 6px;
 }
 
-.bio {
+.user-tag {
+  font-size: 12px;
+}
+
+.user-id {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  margin-bottom: 12px;
+}
+
+.user-bio {
   font-size: 14px;
   color: var(--el-text-color-regular);
-  line-height: 1.6;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  max-width: 600px;
 }
 
-.tags {
+.user-stats-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.actions {
-  display: flex;
-  align-items: flex-start;
-}
-
-.user-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  text-align: center;
+  gap: 24px;
+  margin-bottom: 20px;
 }
 
 .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.stat-item:hover .stat-value {
-  color: var(--el-color-primary);
-}
-
-.stat-value {
-  font-size: 20px;
+.stat-item .count {
+  font-size: 16px;
   font-weight: 600;
   color: var(--el-text-color-primary);
-  margin-bottom: 4px;
 }
 
-.stat-label {
+.stat-item .label {
   font-size: 14px;
   color: var(--el-text-color-secondary);
 }
 
-.posts-section {
-  margin-top: 20px;
+.action-buttons {
+  display: flex;
+  gap: 12px;
 }
 
-.section-title {
-  font-size: 18px;
+.content-tabs {
+  background: var(--el-bg-color);
+  border-radius: 8px;
+  min-height: 400px;
+}
+
+/* 调整 Tabs 样式 */
+:deep(.el-tabs__nav-wrap::after) {
+  height: 1px;
+  background-color: var(--el-border-color-lighter);
+}
+
+:deep(.el-tabs__item) {
+  font-size: 16px;
+  height: 50px;
+  line-height: 50px;
+}
+
+:deep(.el-tabs__item.is-active) {
   font-weight: 600;
-  color: var(--el-text-color-primary);
-  margin-bottom: 16px;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 响应式 Grid */
+  gap: 20px;
+  padding: 20px 0;
 }
 
 .empty-state {
-  padding: 40px 0;
-}
-
-.posts-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  padding: 60px 0;
 }
 
 .load-more {
   text-align: center;
   padding: 20px 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .user-info-section {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .user-info-right {
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .name-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .user-stats-row {
+    justify-content: center;
+  }
+  
+  .posts-grid {
+    grid-template-columns: 1fr; /* 移动端单列 */
+  }
 }
 </style>
