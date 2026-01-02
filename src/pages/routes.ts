@@ -6,6 +6,7 @@ import Home from "@/pages/home/index.vue";
 import PostCreate from "@/pages/post-create/index.vue";
 import PostDetail from "@/pages/post-detail/index.vue";
 import Search from "@/pages/search/index.vue";
+import Follow from "@/pages/follow/index.vue";
 
 export const routes = [
   {
@@ -40,6 +41,12 @@ export const routes = [
         name: "User",
         component: User,
         meta: { title: "用户主页", requireAuth: true },
+      },
+      {
+        path: "follow",
+        name: "Follow",
+        component: Follow,
+        meta: { title: "关注列表", requireAuth: true },
       },
       {
         path: "setting",

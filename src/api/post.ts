@@ -119,3 +119,18 @@ export const updatePostStatus = (
 ): Promise<ApiResponse<PostResponse>> => {
   return apiClient.post(`/api/v1/post/${postId}/`, { action });
 };
+
+// =====获取关注用户的动态=====
+/**
+ * 获取关注用户的帖子列表
+ * GET /api/v1/post/following?page=1&page_size=20
+ * 需要登录
+ */
+export const getFollowingPosts = (
+  page: number = 1,
+  pageSize: number = 20
+): Promise<ApiResponse<PostListResponse>> => {
+  return apiClient.get(
+    `/api/v1/post/following?page=${page}&page_size=${pageSize}`
+  );
+};

@@ -10,17 +10,13 @@
         </div>
       </div>
       <div class="user-stats">
-        <div class="stat-item">
+        <div class="stat-item" @click.stop="goToFollowList('following')">
           <div class="count">{{ userStats.following }}</div>
           <div class="label">关注</div>
         </div>
-        <div class="stat-item">
+        <div class="stat-item" @click.stop="goToFollowList('followers')">
           <div class="count">{{ userStats.followers }}</div>
           <div class="label">粉丝</div>
-        </div>
-        <div class="stat-item">
-          <div class="count">{{ userStats.likes }}</div>
-          <div class="label">获赞</div>
         </div>
       </div>
     </div>
@@ -67,11 +63,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { HomeFilled, User, Plus, Setting } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/user';
 import { useLoginPrompt } from '@/composables/use-login-prompt';
+import { apiClient } from '@/api/core/client';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -87,12 +84,50 @@ const userAvatar = computed(() =>
 const userBio = computed(() => userStore.userInfo?.bio || '这个人很懒，什么都没写~');
 const profilePath = computed(() => `/user/${userStore.userInfo?.id || ''}`);
 
-// TODO: 用户统计数据需要从后端 API 获取，暂时使用占位数据
-const userStats = computed(() => ({
+// 用户统计数据
+const userStats = ref({
   following: 0,
   followers: 0,
   likes: 0,
-}));
+});
+
+// 获取用户统计数据
+const fetchUserStats = async () => {
+  if (!isLoggedIn.value) return;
+  
+  try {
+    const response = await apiClient.get<{
+      code: number;
+      data: {
+        following_count: number;
+        followers_count: number;
+        likes_received: number;
+      };
+    }>('/api/v1/user/me');
+    
+    if (response.code === 0 && response.data) {
+      userStats.value = {
+        following: response.data.following_count || 0,
+        followers: response.data.followers_count || 0,
+        likes: response.data.likes_received || 0,
+      };
+    }
+  } catch (error) {
+    console.error('Failed to fetch user stats:', error);
+  }
+};
+
+// 初始化时获取数据
+onMounted(fetchUserStats);
+
+// 登录状态变化时重新获取
+watch(isLoggedIn, (newVal) => {
+  if (newVal) {
+    fetchUserStats();
+  } else {
+    userStats.value = { following: 0, followers: 0, likes: 0 };
+  }
+});
 
 // 跳转到个人主页
 const goToProfile = () => {
@@ -104,6 +139,11 @@ const goToProfile = () => {
 // 跳转到登录页
 const goToLogin = () => {
   router.push('/login');
+};
+
+// 跳转到关注/粉丝列表
+const goToFollowList = (type: 'following' | 'followers') => {
+  router.push(`/follow?type=${type}`);
 };
 
 // 发布动态（需要登录）

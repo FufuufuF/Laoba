@@ -5,10 +5,12 @@
       
       <el-card class="post-card">
         <div class="post-header">
-          <el-avatar :src="post.author.avatar" />
-          <div class="meta">
-            <span class="nickname">{{ post.author.name }}</span>
-            <span class="time">{{ formatTime(post.createAt) }}</span>
+          <div class="author-info" @click="goToAuthor">
+            <el-avatar :src="post.author.avatar" class="author-avatar" />
+            <div class="meta">
+              <span class="nickname">{{ post.author.name }}</span>
+              <span class="time">{{ formatTime(post.createAt) }}</span>
+            </div>
           </div>
         </div>
         
@@ -86,7 +88,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { usePostDetail } from './composables/use-post-detail';
 import { useComments } from './composables/use-comments';
 import { usePostActions } from './composables/use-post-actions';
@@ -94,6 +96,7 @@ import { formatTime } from './utils';
 import { Star, ChatDotRound } from '@element-plus/icons-vue';
 
 const route = useRoute();
+const router = useRouter();
 const postId = Number(route.params.id);
 
 // Composables
@@ -104,6 +107,13 @@ const { handleLike } = usePostActions(post);
 // 加载数据
 const loadData = async () => {
   await Promise.all([loadPostDetail(), loadComments()]);
+};
+
+// 跳转到作者主页
+const goToAuthor = () => {
+  if (post.value) {
+    router.push(`/user/${post.value.author.id}`);
+  }
 };
 
 onMounted(loadData);
@@ -118,6 +128,18 @@ onMounted(loadData);
 .mb-4 { margin-bottom: 16px; }
 .mt-2 { margin-top: 8px; }
 .post-header { display: flex; gap: 12px; margin-bottom: 16px; }
+.author-info { 
+  display: flex; 
+  gap: 12px; 
+  cursor: pointer; 
+  padding: 8px; 
+  margin: -8px; 
+  border-radius: 8px; 
+  transition: background-color 0.2s; 
+}
+.author-info:hover { background-color: var(--el-fill-color-light); }
+.author-avatar { transition: transform 0.2s; }
+.author-info:hover .author-avatar { transform: scale(1.05); }
 .meta { display: flex; flex-direction: column; }
 .nickname { font-weight: bold; }
 .time { font-size: 12px; color: #999; }

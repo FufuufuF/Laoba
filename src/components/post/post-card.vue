@@ -2,8 +2,8 @@
   <el-card class="post-card" shadow="hover" :class="{ 'clickable': clickable }" @click="handleClick">
     <!-- 作者信息区域 -->
     <div class="post-header">
-      <div class="author-info">
-        <el-avatar :size="40" :src="post.author.avatar" />
+      <div class="author-info" @click.stop="handleAuthorClick">
+        <el-avatar :size="40" :src="post.author.avatar" class="author-avatar" />
         <div class="author-details">
           <span class="author-name">{{ post.author.name }}</span>
           <span class="post-time">{{ formatTime(post.createAt) }}</span>
@@ -93,6 +93,7 @@ const emit = defineEmits<{
   (e: 'like', postId: number): void;
   (e: 'comment', postId: number): void;
   (e: 'share', postId: number): void;
+  (e: 'author-click', authorId: number): void;
 }>();
 
 // 点击卡片
@@ -100,6 +101,11 @@ const handleClick = () => {
   if (props.clickable) {
     emit('click', props.post);
   }
+};
+
+// 点击作者头像
+const handleAuthorClick = () => {
+  emit('author-click', props.post.author.id);
 };
 
 // 点赞
@@ -170,6 +176,23 @@ const formatTime = (timestamp: number): string => {
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 4px;
+  margin: -4px;
+  transition: background-color 0.2s;
+}
+
+.author-info:hover {
+  background-color: var(--el-fill-color-light);
+}
+
+.author-avatar {
+  transition: transform 0.2s;
+}
+
+.author-info:hover .author-avatar {
+  transform: scale(1.05);
 }
 
 .author-details {

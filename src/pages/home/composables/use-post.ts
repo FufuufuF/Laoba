@@ -1,11 +1,15 @@
 import { ref } from "vue";
 import type { Post } from "@/types/post";
-import { getPosts as getPostsApi } from "@/api/post";
+import {
+  getPosts as getPostsApi,
+  getFollowingPosts as getFollowingPostsApi,
+} from "@/api/post";
 import type { PostResponse } from "@/api/post";
 
 export const usePost = () => {
   const postList = ref<Post[]>([]);
   const currentSort = ref<"latest" | "hot">("latest");
+  const feedType = ref<"all" | "following">("all"); // 新增：Feed 类型
   const currentPage = ref(1);
   const pageSize = ref(20);
   const total = ref(0);
@@ -36,10 +40,29 @@ export const usePost = () => {
 
   const fetchPostList = async (sortBy: "latest" | "hot" = "latest") => {
     currentSort.value = sortBy;
+    feedType.value = "all";
     currentPage.value = 1;
     isLoading.value = true;
     try {
       const res = await getPostsApi(sortBy, 1, pageSize.value);
+      const posts = res.data.posts.map(mapPostResponse);
+      postList.value = posts;
+      total.value = res.data.total;
+      hasMore.value = res.data.page < res.data.total_pages;
+    } catch (e) {
+      console.error(e);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  // 新增：获取关注用户的动态
+  const fetchFollowingPosts = async () => {
+    feedType.value = "following";
+    currentPage.value = 1;
+    isLoading.value = true;
+    try {
+      const res = await getFollowingPostsApi(1, pageSize.value);
       const posts = res.data.posts.map(mapPostResponse);
       postList.value = posts;
       total.value = res.data.total;
@@ -57,11 +80,16 @@ export const usePost = () => {
     isLoading.value = true;
     currentPage.value++;
     try {
-      const res = await getPostsApi(
-        currentSort.value,
-        currentPage.value,
-        pageSize.value
-      );
+      let res;
+      if (feedType.value === "following") {
+        res = await getFollowingPostsApi(currentPage.value, pageSize.value);
+      } else {
+        res = await getPostsApi(
+          currentSort.value,
+          currentPage.value,
+          pageSize.value
+        );
+      }
       const newPosts = res.data.posts.map(mapPostResponse);
       postList.value = [...postList.value, ...newPosts];
       hasMore.value = res.data.page < res.data.total_pages;
@@ -76,11 +104,13 @@ export const usePost = () => {
   return {
     postList,
     currentSort,
+    feedType,
     currentPage,
     total,
     hasMore,
     isLoading,
     fetchPostList,
+    fetchFollowingPosts,
     loadMore,
   };
 };

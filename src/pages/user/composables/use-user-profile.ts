@@ -1,6 +1,13 @@
 import { ref, onMounted } from "vue";
 import { ElMessage } from "element-plus";
-import { getUserInfo, getUserPosts, followUser, unfollowUser, type UserProfile, type RawPost } from "../api";
+import {
+  getUserInfo,
+  getUserPosts,
+  followUser,
+  unfollowUser,
+  type UserProfile,
+  type RawPost,
+} from "../api";
 import type { Post } from "@/types/post";
 
 /**
@@ -36,12 +43,12 @@ const mapPost = (raw: RawPost): Post => {
 export const useUserProfile = (userId: string) => {
   const loading = ref(false);
   const userInfo = ref<UserProfile | null>(null);
-  
+
   // 帖子列表相关
   const posts = ref<Post[]>([]);
   const postsTotal = ref(0);
   const postsPage = ref(1);
-  
+
   const pageSize = 20;
 
   // 加载用户信息
@@ -73,7 +80,7 @@ export const useUserProfile = (userId: string) => {
       // 适配旧接口返回结构 { posts: [] }
       const list = (res.data as any).posts || (res.data as any).list || [];
       const total = (res.data as any).total || list.length; // 旧接口可能没有 total
-      
+
       const mappedPosts = list.map(mapPost);
       posts.value = reset ? mappedPosts : [...posts.value, ...mappedPosts];
       postsTotal.value = total;
@@ -90,25 +97,35 @@ export const useUserProfile = (userId: string) => {
     }
   };
 
-  // 关注/取消关注
+  // 关注/取消关注（带乐观更新和回滚）
   const handleFollow = async () => {
     if (!userInfo.value) return;
-    
-    const isFollowing = userInfo.value.is_following;
+
+    const previousIsFollowing = userInfo.value.is_following;
+    const previousFollowersCount = userInfo.value.followers_count;
+
+    // 乐观更新：立即更新 UI
+    if (previousIsFollowing) {
+      userInfo.value.is_following = false;
+      userInfo.value.followers_count = Math.max(0, previousFollowersCount - 1);
+    } else {
+      userInfo.value.is_following = true;
+      userInfo.value.followers_count = previousFollowersCount + 1;
+    }
+
     try {
-      if (isFollowing) {
+      if (previousIsFollowing) {
         await unfollowUser(userId);
-        userInfo.value.is_following = false;
-        userInfo.value.followers_count = Math.max(0, userInfo.value.followers_count - 1);
         ElMessage.success("已取消关注");
       } else {
         await followUser(userId);
-        userInfo.value.is_following = true;
-        userInfo.value.followers_count++;
         ElMessage.success("关注成功");
       }
     } catch (error) {
-      ElMessage.error(isFollowing ? "取消关注失败" : "关注失败");
+      // 回滚状态
+      userInfo.value.is_following = previousIsFollowing;
+      userInfo.value.followers_count = previousFollowersCount;
+      ElMessage.error(previousIsFollowing ? "取消关注失败" : "关注失败");
     }
   };
 
@@ -133,6 +150,6 @@ export const useUserProfile = (userId: string) => {
     postsTotal,
     loadUserPosts,
     loadMorePosts,
-    handleFollow
+    handleFollow,
   };
 };

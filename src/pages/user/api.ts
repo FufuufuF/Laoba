@@ -43,9 +43,10 @@ export interface UserProfile {
   followers_count: number;
   following_count: number;
   is_following: boolean;
+  likes_received: number; // 用户收到的总点赞数
   // 前端兼容字段（可选，后端暂无）
-  background?: string; 
-  likeCount?: number; 
+  background?: string;
+  likeCount?: number; // 可删除，使用 likes_received 代替
 }
 
 // 帖子列表响应接口
@@ -64,7 +65,9 @@ export interface FollowResponse {
  * @param userId 用户ID
  */
 export const getUserInfo = (userId: string | number) => {
-  return apiClient.get<ApiResponse<UserProfile>>(`/api/v1/user/users/${userId}`);
+  return apiClient.get<ApiResponse<UserProfile>>(
+    `/api/v1/user/users/${userId}`
+  );
 };
 
 /**
@@ -73,10 +76,17 @@ export const getUserInfo = (userId: string | number) => {
  * @param page 页码
  * @param pageSize 每页数量
  */
-export const getUserPosts = (userId: string | number, page = 1, pageSize = 20) => {
-  return apiClient.get<ApiResponse<UserPostsResponse>>(`/api/v1/user/users/${userId}/posts`, {
-    params: { page, page_size: pageSize }
-  });
+export const getUserPosts = (
+  userId: string | number,
+  page = 1,
+  pageSize = 20
+) => {
+  return apiClient.get<ApiResponse<UserPostsResponse>>(
+    `/api/v1/user/users/${userId}/posts`,
+    {
+      params: { page, page_size: pageSize },
+    }
+  );
 };
 
 /**
@@ -85,10 +95,17 @@ export const getUserPosts = (userId: string | number, page = 1, pageSize = 20) =
  * @param page 页码
  * @param pageSize 每页数量
  */
-export const getUserFavorites = (userId: string | number, page = 1, pageSize = 20) => {
-  return apiClient.get<ApiResponse<UserPostsResponse>>(`/api/v1/user/users/${userId}/favorites`, {
-    params: { page, page_size: pageSize }
-  });
+export const getUserFavorites = (
+  userId: string | number,
+  page = 1,
+  pageSize = 20
+) => {
+  return apiClient.get<ApiResponse<UserPostsResponse>>(
+    `/api/v1/user/users/${userId}/favorites`,
+    {
+      params: { page, page_size: pageSize },
+    }
+  );
 };
 
 /**
@@ -96,7 +113,10 @@ export const getUserFavorites = (userId: string | number, page = 1, pageSize = 2
  * @param userId 目标用户ID
  */
 export const followUser = (userId: string | number) => {
-  return apiClient.post<ApiResponse<FollowResponse>>(`/api/v1/user/users/${userId}/follow`, {});
+  return apiClient.post<ApiResponse<FollowResponse>>(
+    `/api/v1/user/users/${userId}/follow`,
+    {}
+  );
 };
 
 /**
@@ -104,5 +124,7 @@ export const followUser = (userId: string | number) => {
  * @param userId 目标用户ID
  */
 export const unfollowUser = (userId: string | number) => {
-  return apiClient.delete<ApiResponse<FollowResponse>>(`/api/v1/user/users/${userId}/follow`);
+  return apiClient.delete<ApiResponse<FollowResponse>>(
+    `/api/v1/user/users/${userId}/follow`
+  );
 };

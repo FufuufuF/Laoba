@@ -1,11 +1,20 @@
 <template>
     <div class="home-container">
         <div class="feed-header">
-            <el-tabs v-model="activeTab" @tab-change="handleTabChange">
-                <el-tab-pane label="最新发布" name="latest" />
-                <el-tab-pane label="热门推荐" name="hot" />
+            <!-- 主 Tab：全站动态 / 关注动态 -->
+            <el-tabs v-model="mainTab" @tab-change="handleMainTabChange" class="main-tabs">
+                <el-tab-pane label="全站动态" name="all" />
+                <el-tab-pane label="关注动态" name="following" :disabled="!isLoggedIn" />
             </el-tabs>
             <el-button type="primary" @click="goToCreate">发布动态</el-button>
+        </div>
+        
+        <!-- 子 Tab：仅全站动态时显示排序选项 -->
+        <div v-if="mainTab === 'all'" class="sort-tabs">
+            <el-radio-group v-model="activeTab" size="small" @change="handleSortChange">
+                <el-radio-button label="latest">最新发布</el-radio-button>
+                <el-radio-button label="hot">热门推荐</el-radio-button>
+            </el-radio-group>
         </div>
         
         <div class="post-list">
@@ -16,7 +25,7 @@
             
             <!-- 空状态 -->
             <div v-else-if="postList.length === 0" class="empty-state">
-                <el-empty description="暂无帖子" />
+                <el-empty :description="mainTab === 'following' ? '还没有关注任何人，去发现更多用户吧' : '暂无帖子'" />
             </div>
             
             <!-- 帖子列表 -->
@@ -28,6 +37,7 @@
                     @click="() => goToDetail(post)"
                     @like="handleLike"
                     @comment="() => goToDetail(post)"
+                    @author-click="goToUserProfile"
                 />
             </template>
         </div>
@@ -47,19 +57,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { usePost } from './composables/use-post';
+import { useUserStore } from '@/stores/user';
 import PostCard from '@/components/post/post-card.vue';
 import PostSkeleton from '@/components/post/post-skeleton.vue';
 import { updatePostStatus } from '@/api/post';
 import type { Post } from '@/types/post';
 
 const router = useRouter();
-const { postList, hasMore, fetchPostList, loadMore } = usePost();
+const userStore = useUserStore();
+const { postList, hasMore, fetchPostList, fetchFollowingPosts, loadMore } = usePost();
 const loading = ref(false);
+const mainTab = ref<'all' | 'following'>('all');
 const activeTab = ref<'latest' | 'hot'>('latest');
+
+// 是否已登录
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const goToCreate = () => {
     router.push('/post-create');
@@ -69,10 +85,30 @@ const goToDetail = (post: Post) => {
     router.push(`/post/${post.id}`);
 };
 
-const handleTabChange = async (tab: 'latest' | 'hot') => {
+// 跳转到用户主页
+const goToUserProfile = (userId: number) => {
+    router.push(`/user/${userId}`);
+};
+
+// 主 Tab 切换
+const handleMainTabChange = async (tab: 'all' | 'following') => {
     loading.value = true;
     try {
-        await fetchPostList(tab);
+        if (tab === 'following') {
+            await fetchFollowingPosts();
+        } else {
+            await fetchPostList(activeTab.value);
+        }
+    } finally {
+        loading.value = false;
+    }
+};
+
+// 排序 Tab 切换
+const handleSortChange = async (sortBy: 'latest' | 'hot') => {
+    loading.value = true;
+    try {
+        await fetchPostList(sortBy);
     } finally {
         loading.value = false;
     }
@@ -118,10 +154,10 @@ onMounted(async () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
-.feed-header :deep(.el-tabs) {
+.feed-header .main-tabs {
     flex: 1;
 }
 
@@ -131,6 +167,10 @@ onMounted(async () => {
 
 .feed-header :deep(.el-tabs__nav-wrap::after) {
     display: none;
+}
+
+.sort-tabs {
+    margin-bottom: 16px;
 }
 
 .post-list {

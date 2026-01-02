@@ -46,8 +46,8 @@
               <span class="label">粉丝</span>
             </div>
             <div class="stat-item">
-              <span class="count">{{ userInfo?.likeCount || 0 }}</span>
-              <span class="label">获赞与收藏</span>
+              <span class="count">{{ userInfo?.likes_received || 0 }}</span>
+              <span class="label">获赞</span>
             </div>
           </div>
           
@@ -82,9 +82,10 @@
               v-for="post in posts"
               :key="post.id"
               :post="post"
-              @click="goToDetail"
+              @click="(p: Post) => goToDetail(p)"
               @like="handleLike"
-              @comment="goToDetail"
+              @comment="(p: Post) => goToDetail(p)"
+              @author-click="goToUserProfile"
             >
               <template #actions>
                 <el-dropdown v-if="isAuthor(post)" @command="(cmd: string) => handleCommand(cmd, post.id)" @click.stop>
@@ -162,6 +163,11 @@ const goToSetting = () => {
 // 跳转到帖子详情
 const goToDetail = (post: Post) => {
   router.push(`/post/${post.id}`);
+};
+
+// 跳转到用户主页
+const goToUserProfile = (userId: number) => {
+  router.push(`/user/${userId}`);
 };
 
 // 点赞
