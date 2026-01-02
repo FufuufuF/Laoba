@@ -53,6 +53,16 @@ export const getPosts = (
   return apiClient.get(`/api/v1/post/?sort_by=${sortBy}`);
 };
 
+/**
+ * 获取指定用户的帖子列表
+ * GET /api/v1/user/users/{user_id}/posts
+ */
+export const getUserPosts = (
+  userId: number | string
+): Promise<ApiResponse<PostListResponse>> => {
+  return apiClient.get(`/api/v1/user/users/${userId}/posts`);
+};
+
 // =====post接口=====
 // 创建帖子
 

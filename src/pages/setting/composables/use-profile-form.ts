@@ -2,12 +2,15 @@
  * 个人资料表单逻辑组合式函数
  */
 import { ref, reactive, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
 import type { UserInfo } from "@/stores/user";
 import { validateNickname } from "@/utils/validate";
+import { updateProfileApi } from "../api";
 
 export const useProfileForm = () => {
+  const route = useRoute();
   const userStore = useUserStore();
   const profileFormRef = ref();
   const isEdit = ref(false);
@@ -40,14 +43,29 @@ export const useProfileForm = () => {
   /**
    * 头像上传成功回调
    */
-  const handleAvatarUpload = (_response: any, file: any) => {
-    profileForm.avatar = URL.createObjectURL(file.raw);
-    ElMessage({
-      message: "头像上传成功",
-      type: "success",
-      showClose: true,
-      duration: 2000,
-    });
+  const handleAvatarUpload = (file: any) => {
+    // 将文件转换为 Base64
+    if (!file.raw) return;
+    const reader = new FileReader();
+    reader.readAsDataURL(file.raw);
+    reader.onload = () => {
+      profileForm.avatar = reader.result as string;
+      ElMessage({
+        message: "头像已选择",
+        type: "success",
+        showClose: true,
+        duration: 2000,
+      });
+    };
+    reader.onerror = (error) => {
+      console.error("头像转换失败:", error);
+      ElMessage({
+        message: "头像处理失败",
+        type: "error",
+        showClose: true,
+        duration: 2000,
+      });
+    };
   };
 
   /**
@@ -69,12 +87,20 @@ export const useProfileForm = () => {
       await profileFormRef.value?.validate();
       saveLoading.value = true;
 
-      // 更新用户信息
-      userStore.editUserInfo({
+      // 调用后端 API 更新
+      const res = await updateProfileApi({
         nickname: profileForm.nickname,
         avatar: profileForm.avatar,
         bio: profileForm.bio,
         tags: profileForm.tags,
+      });
+
+      // 更新用户信息
+      userStore.editUserInfo({
+        nickname: res.data.nickname,
+        avatar: res.data.avatar,
+        bio: res.data.bio,
+        tags: res.data.tags,
       });
 
       ElMessage({
@@ -102,6 +128,10 @@ export const useProfileForm = () => {
   // 挂载时初始化表单数据
   onMounted(() => {
     initFormData();
+    // 如果路由参数中有 edit=true，则自动开启编辑模式
+    if (route.query.edit === 'true') {
+      isEdit.value = true;
+    }
   });
 
   return {

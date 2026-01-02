@@ -19,15 +19,20 @@
     <el-form-item :label="FORM_LABELS.avatar">
       <el-upload
         v-if="isEdit"
+        class="avatar-uploader"
         action="#"
         :show-file-list="false"
-        :on-success="handleAvatarUpload"
+        :auto-upload="false"
+        :on-change="handleAvatarUpload"
         accept="image/*"
       >
-        <img
-          :src="profileForm.avatar"
-          class="avatar-preview"
-        />
+        <div v-if="profileForm.avatar" class="avatar-wrapper">
+          <img :src="profileForm.avatar" class="avatar-preview" />
+          <div class="avatar-overlay">
+            <el-icon><Plus /></el-icon>
+          </div>
+        </div>
+        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
       </el-upload>
       <img
         v-else
@@ -79,6 +84,7 @@
 </template>
 
 <script setup lang="ts">
+import { Plus } from '@element-plus/icons-vue';
 import { useProfileForm } from '../composables/use-profile-form';
 import { INTEREST_TAGS, FORM_LABELS } from '../const';
 
@@ -99,12 +105,58 @@ const {
 </script>
 
 <style scoped>
+.avatar-uploader .avatar-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar-uploader .avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 24px;
+}
+
+.avatar-uploader .avatar-wrapper:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  line-height: 100px;
+  border: 1px dashed var(--el-border-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.avatar-uploader-icon:hover {
+  border-color: var(--el-color-primary);
+  color: var(--el-color-primary);
+}
+
 .avatar-preview {
   width: 100px;
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
-  cursor: pointer;
+  display: block;
 }
 </style>
 
