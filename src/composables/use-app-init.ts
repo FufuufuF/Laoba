@@ -46,7 +46,7 @@ export function useAppInit() {
             userStore.setUserData({
               id: String(userData.id),
               username: userData.student_id,
-              avatar: userData.avator,
+              avatar: userData.avatar,
               nickname: userData.nickname,
               bio: userData.bio,
               role: userData.role,

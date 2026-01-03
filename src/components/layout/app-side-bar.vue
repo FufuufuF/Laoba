@@ -99,6 +99,9 @@ const fetchUserStats = async () => {
     const response = await apiClient.get<{
       code: number;
       data: {
+        avatar: string;
+        bio: string;
+        nickname: string;
         following_count: number;
         followers_count: number;
         likes_received: number;
@@ -111,6 +114,13 @@ const fetchUserStats = async () => {
         followers: response.data.followers_count || 0,
         likes: response.data.likes_received || 0,
       };
+      
+      // 同步更新用户头像和其他资料到 store
+      userStore.editUserInfo({
+        avatar: response.data.avatar || '',
+        bio: response.data.bio || '',
+        nickname: response.data.nickname || userStore.userInfo?.nickname,
+      });
     }
   } catch (error) {
     console.error('Failed to fetch user stats:', error);

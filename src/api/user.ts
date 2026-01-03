@@ -7,7 +7,7 @@ export interface GetUserInfoResponse {
   student_id: string;
   username: string;
   nickname: string;
-  avator: string;
+  avatar: string;
   bio: string;
   tags: string[];
   role: "student" | "admin";

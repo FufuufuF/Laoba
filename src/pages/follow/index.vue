@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, watch, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useFollowList } from './composables/use-follow-list';
 import { useUserStore } from '@/stores/user';
@@ -76,7 +76,7 @@ const listType = computed(() => {
 // 获取当前用户 ID（侧边栏点击时默认显示自己的关注/粉丝）
 const currentUserId = computed(() => {
   const idFromQuery = route.query.userId as string;
-  return idFromQuery ? Number(idFromQuery) : (userStore.userInfo?.id || 0);
+  return idFromQuery ? Number(idFromQuery) : Number(userStore.userInfo?.id || 0);
 });
 
 // 页面标题
@@ -91,11 +91,55 @@ const emptyText = computed(() =>
 
 const defaultAvatar = 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png';
 
-// 使用 composable（使用 Number 确保类型正确）
-const { list, hasMore, isLoading, fetchList, loadMore, toggleFollow } = useFollowList(
-  Number(currentUserId.value),
-  listType.value
-);
+// 手动管理列表状态
+const list = ref<FollowUserItem[]>([]);
+const hasMore = ref(false);
+const isLoading = ref(false);
+
+// 创建一个变量来保存当前的 composable 实例
+let currentFollowList: ReturnType<typeof useFollowList> | null = null;
+
+// 获取列表函数
+const refreshList = async () => {
+  if (!currentUserId.value) return;
+  
+  // 每次切换时创建新的 composable 实例
+  currentFollowList = useFollowList(
+    currentUserId.value,
+    listType.value
+  );
+  
+  // 同步响应式状态
+  list.value = [];
+  isLoading.value = true;
+  
+  await currentFollowList.fetchList(true);
+  
+  list.value = currentFollowList.list.value;
+  hasMore.value = currentFollowList.hasMore.value;
+  isLoading.value = currentFollowList.isLoading.value;
+};
+
+// 加载更多
+const loadMore = async () => {
+  if (!currentFollowList || !hasMore.value || isLoading.value) return;
+  
+  isLoading.value = true;
+  await currentFollowList.loadMore();
+  
+  list.value = currentFollowList.list.value;
+  hasMore.value = currentFollowList.hasMore.value;
+  isLoading.value = currentFollowList.isLoading.value;
+};
+
+// 关注/取消关注
+const handleToggleFollow = async (userId: number) => {
+  if (!currentFollowList) return;
+  
+  await currentFollowList.toggleFollow(userId);
+  // 同步列表状态
+  list.value = [...currentFollowList.list.value];
+};
 
 // 是否显示关注按钮（不显示自己）
 const showFollowButton = (user: FollowUserItem) => {
@@ -108,16 +152,16 @@ const goToUserProfile = (userId: number) => {
   router.push(`/user/${userId}`);
 };
 
-// 关注/取消关注
-const handleToggleFollow = async (userId: number) => {
-  await toggleFollow(userId);
-};
-
-onMounted(() => {
-  if (currentUserId.value) {
-    fetchList(true);
-  }
-});
+// 监听 listType 和 currentUserId 变化，重新请求数据
+watch(
+  [listType, currentUserId],
+  () => {
+    if (currentUserId.value) {
+      refreshList();
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>

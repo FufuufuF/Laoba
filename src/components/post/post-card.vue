@@ -67,16 +67,12 @@
         <el-icon><ChatDotRound /></el-icon>
         <span>{{ post.status.commentCount }}</span>
       </div>
-      <div class="stat-item" @click="handleShare">
-        <el-icon><Share /></el-icon>
-        <span>{{ post.status.shareCount }}</span>
-      </div>
     </div>
   </el-card>
 </template>
 
 <script setup lang="ts">
-import { ChatDotRound, Star, Share } from '@element-plus/icons-vue';
+import { ChatDotRound, Star } from '@element-plus/icons-vue';
 import type { Post } from '@/types/post';
 
 // 定义 props
@@ -116,11 +112,6 @@ const handleLike = () => {
 // 评论
 const handleComment = () => {
   emit('comment', props.post.id);
-};
-
-// 分享
-const handleShare = () => {
-  emit('share', props.post.id);
 };
 
 // 格式化时间

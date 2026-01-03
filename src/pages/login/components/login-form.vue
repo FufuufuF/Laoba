@@ -15,14 +15,13 @@
       <el-form-item label="密码" prop="password">
         <el-input
           v-model="loginForm.password"
-          :type="showPwd ? 'text' : 'password'"
+          type="password"
           :placeholder="PLACEHOLDERS.login.password"
-          suffix-icon="el-icon-view"
-          @click="showPwd = !showPwd"
+          show-password
         />
       </el-form-item>
       <el-form-item>
-        <el-checkbox v-model="rememberMe">记住我</el-checkbox>
+        <el-checkbox v-model="rememberMe" @change="handleRememberMeChange">记住我</el-checkbox>
         <el-button
           type="text"
           @click="handleForgetClick"
@@ -53,7 +52,6 @@ import { useForgetPassword } from '../composables/use-forget-password';
 import { PLACEHOLDERS } from '../const';
 
 const userStore = useUserStore();
-const showPwd = ref(false);
 const rememberMe = ref(userStore.rememberMe);
 
 // 使用登录逻辑
@@ -70,6 +68,16 @@ const { handleForgetPwd } = useForgetPassword();
 
 const handleForgetClick = () => {
   handleForgetPwd();
+};
+
+// 处理记住我状态变化
+const handleRememberMeChange = (value: boolean) => {
+  userStore.rememberMe = value;
+  if (value) {
+    localStorage.setItem('rememberMe', 'true');
+  } else {
+    localStorage.removeItem('rememberMe');
+  }
 };
 
 // loginFormRef 在模板中通过 ref 属性使用
