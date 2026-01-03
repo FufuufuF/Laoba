@@ -79,6 +79,7 @@ export interface CreatePostRequest {
   content: string;
   media: MediaItem[];
   tags: string[];
+  visibility?: "public" | "friends" | "private";
 }
 
 export interface CreatePostResponse {
